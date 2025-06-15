@@ -48,7 +48,10 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         polkit-gnome \
         age \
         openssh \
-        github-cli
+        github-cli \
+        noto-fonts-cjk \
+        fcitx5-im \
+        fcitx5-mozc
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS
     echo "Detected macOS system"
@@ -108,6 +111,13 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     echo "Enabling Bluetooth service..."
     sudo systemctl enable bluetooth.service
     sudo systemctl start bluetooth.service
+fi
+
+# Setup Japanese locale support
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    echo "Setting up Japanese locale support..."
+    sudo sed -i 's/#ja_JP.UTF-8 UTF-8/ja_JP.UTF-8 UTF-8/' /etc/locale.gen
+    sudo locale-gen
 fi
 
 echo "All packages installed successfully!"
