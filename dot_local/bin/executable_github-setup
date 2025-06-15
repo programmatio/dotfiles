@@ -17,8 +17,24 @@ fi
 
 # Check authentication status
 if ! gh auth status &> /dev/null; then
-    echo "Not authenticated with GitHub. Starting login process..."
-    gh auth login
+    echo "Not authenticated with GitHub."
+    echo ""
+    echo "Choose authentication method:"
+    echo "1. Login with browser (recommended)"
+    echo "2. Login with authentication token"
+    echo ""
+    read -p "Choice (1 or 2): " -n 1 -r
+    echo
+    
+    if [[ $REPLY == "2" ]]; then
+        echo ""
+        echo "Create a token at: https://github.com/settings/tokens/new"
+        echo "Required scopes: repo, read:org, admin:public_key"
+        echo ""
+        gh auth login --with-token
+    else
+        gh auth login --web
+    fi
 else
     echo "Already authenticated with GitHub."
     gh auth status

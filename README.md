@@ -85,9 +85,15 @@ When setting up a new machine:
 2. The setup will automatically:
    - Install all required packages
    - Generate SSH keys
-   - Prompt to register SSH key with GitHub using `gh` CLI
    - Set up age encryption for sensitive files
 
-3. Run `github-setup` to verify GitHub authentication and SSH access
+3. After installation completes, run:
+   ```bash
+   github-setup
+   ```
+   This will:
+   - Authenticate you with GitHub (via browser or token)
+   - Automatically register your SSH key
+   - Test the connection
 
 4. For accessing encrypted files on additional machines, see [ENCRYPTION.md](ENCRYPTION.md)
