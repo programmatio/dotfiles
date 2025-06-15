@@ -1,0 +1,81 @@
+#!/bin/bash
+
+set -e
+
+SSH_DIR="$HOME/.ssh"
+SSH_KEY="$SSH_DIR/id_ed25519"
+
+# Create .ssh directory if it doesn't exist
+mkdir -p "$SSH_DIR"
+chmod 700 "$SSH_DIR"
+
+# Generate SSH key if it doesn't exist
+if [ ! -f "$SSH_KEY" ]; then
+    echo "Generating ED25519 SSH key..."
+    ssh-keygen -t ed25519 -C "max.spogis@gmail.com" -f "$SSH_KEY" -N ""
+    
+    # Set proper permissions
+    chmod 600 "$SSH_KEY"
+    chmod 644 "$SSH_KEY.pub"
+    
+    echo "SSH key generated successfully!"
+    
+    # Try to add key to GitHub using gh CLI
+    if command -v gh &> /dev/null; then
+        echo ""
+        echo "Would you like to add this SSH key to your GitHub account?"
+        echo "You'll need to authenticate with GitHub CLI first."
+        read -p "Add to GitHub? (y/N): " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            # Get hostname for the key title
+            HOSTNAME=$(hostname)
+            KEY_TITLE="${HOSTNAME}-$(date +%Y%m%d)"
+            
+            # Authenticate if needed
+            if ! gh auth status &> /dev/null; then
+                echo "Authenticating with GitHub..."
+                gh auth login
+            fi
+            
+            # Add the SSH key
+            gh ssh-key add "$SSH_KEY.pub" --title "$KEY_TITLE" && {
+                echo "SSH key successfully added to GitHub!"
+            } || {
+                echo "Failed to add SSH key to GitHub automatically."
+                echo "Your public key is:"
+                cat "$SSH_KEY.pub"
+                echo ""
+                echo "Add this key manually at: https://github.com/settings/keys"
+            }
+        else
+            echo "Your public key is:"
+            cat "$SSH_KEY.pub"
+            echo ""
+            echo "Add this key to your GitHub account: https://github.com/settings/keys"
+        fi
+    else
+        echo "Your public key is:"
+        cat "$SSH_KEY.pub"
+        echo ""
+        echo "Add this key to your GitHub account: https://github.com/settings/keys"
+    fi
+else
+    echo "SSH key already exists at $SSH_KEY"
+fi
+
+# Create SSH config if it doesn't exist
+if [ ! -f "$SSH_DIR/config" ]; then
+    cat > "$SSH_DIR/config" << 'EOF'
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+
+Host *
+    AddKeysToAgent yes
+    IdentityFile ~/.ssh/id_ed25519
+EOF
+    chmod 600 "$SSH_DIR/config"
+fi

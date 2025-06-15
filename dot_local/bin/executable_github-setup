@@ -1,0 +1,87 @@
+#!/bin/bash
+
+# GitHub setup helper script
+
+set -e
+
+echo "GitHub Setup Helper"
+echo "=================="
+
+# Check if gh is installed
+if ! command -v gh &> /dev/null; then
+    echo "GitHub CLI not found. Please install it first:"
+    echo "  Arch: sudo pacman -S github-cli"
+    echo "  macOS: brew install gh"
+    exit 1
+fi
+
+# Check authentication status
+if ! gh auth status &> /dev/null; then
+    echo "Not authenticated with GitHub. Starting login process..."
+    gh auth login
+else
+    echo "Already authenticated with GitHub."
+    gh auth status
+fi
+
+# Check SSH keys
+SSH_KEY="$HOME/.ssh/id_ed25519.pub"
+if [ -f "$SSH_KEY" ]; then
+    echo ""
+    echo "Found SSH key. Checking if it's registered on GitHub..."
+    
+    # Get the key fingerprint
+    KEY_FINGERPRINT=$(ssh-keygen -lf "$SSH_KEY" | awk '{print $2}')
+    
+    # Check if key is already on GitHub
+    if gh ssh-key list | grep -q "$KEY_FINGERPRINT"; then
+        echo "✓ SSH key is already registered on GitHub"
+    else
+        echo "SSH key not found on GitHub. Adding it now..."
+        HOSTNAME=$(hostname)
+        KEY_TITLE="${HOSTNAME}-$(date +%Y%m%d)"
+        
+        if gh ssh-key add "$SSH_KEY" --title "$KEY_TITLE"; then
+            echo "✓ SSH key successfully added to GitHub!"
+        else
+            echo "✗ Failed to add SSH key to GitHub"
+            exit 1
+        fi
+    fi
+else
+    echo "No SSH key found. Run 'chezmoi apply' first to generate one."
+    exit 1
+fi
+
+# Test SSH connection
+echo ""
+echo "Testing SSH connection to GitHub..."
+if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
+    echo "✓ SSH connection to GitHub is working!"
+else
+    echo "✗ SSH connection test failed"
+    echo "Try running: ssh -T git@github.com"
+    exit 1
+fi
+
+# Common repo operations
+echo ""
+echo "Common operations:"
+echo "  Clone a repo:     gh repo clone owner/repo"
+echo "  Create a repo:    gh repo create"
+echo "  List your repos:  gh repo list"
+echo "  Fork a repo:      gh repo fork owner/repo"
+
+# Check if in a git repo
+if git rev-parse --git-dir > /dev/null 2>&1; then
+    echo ""
+    echo "Current repository:"
+    if git remote -v | grep -q github.com; then
+        REPO=$(git remote get-url origin | sed 's/.*github.com[:/]\(.*\)\.git/\1/')
+        echo "  View on GitHub:   gh repo view"
+        echo "  Create PR:        gh pr create"
+        echo "  View PRs:         gh pr list"
+    else
+        echo "  Not a GitHub repository"
+    fi
+fi

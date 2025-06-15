@@ -1,0 +1,24 @@
+# Chezmoi state
+.chezmoidata.json
+.chezmoistate.boltdb
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# NEVER commit age private keys
+**/age/key.txt
+.config/age/
+age-key.txt
