@@ -24,6 +24,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         kitty \
         i3-wm \
         i3status \
+        i3blocks \
         i3lock \
         dmenu \
         rofi \
@@ -39,6 +40,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         pipewire-jack \
         wireplumber \
         pavucontrol \
+        pasystray \
         playerctl \
         brightnessctl \
         network-manager-applet \
