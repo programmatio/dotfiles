@@ -4,7 +4,7 @@
 set $mod Mod1
 
 # Font for window titles
-font pango:JetBrainsMono Nerd Font 10
+font pango:JetBrainsMono Nerd Font 14
 
 # Define colors (Tokyo Night theme)
 set $bg-color            #1a1b26
@@ -14,6 +14,7 @@ set $inactive-text-color #565f89
 set $urgent-bg-color     #f7768e
 set $indicator-color     #7aa2f7
 set $border-color        #7aa2f7
+set $separator-color     #414868
 
 # Window colors
 #                       border              background         text                 indicator         child_border
@@ -218,10 +219,13 @@ bar {
         
         colors {
                 background $bg-color
-                separator  $inactive-text-color
+                separator  $separator-color
+                statusline $text-color
                 #                  border             background         text
-                focused_workspace  $border-color      $border-color      $bg-color
-                inactive_workspace $inactive-bg-color $inactive-bg-color $text-color
-                urgent_workspace   $urgent-bg-color   $urgent-bg-color   $text-color
+                focused_workspace  $border-color      $border-color      $text-color
+                inactive_workspace $inactive-bg-color $inactive-bg-color $inactive-text-color
+                active_workspace   $border-color      $inactive-bg-color $text-color
+                urgent_workspace   $urgent-bg-color   $urgent-bg-color   $bg-color
+                binding_mode       $urgent-bg-color   $urgent-bg-color   $bg-color
         }
 }

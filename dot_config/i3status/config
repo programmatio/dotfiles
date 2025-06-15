@@ -1,79 +1,50 @@
-# i3status configuration file.
-# see "man i3status" for documentation.
-
 general {
         colors = true
         interval = 5
         color_good = "#9ece6a"
-        color_degraded = "#e0af68"
         color_bad = "#f7768e"
+        color_degraded = "#e0af68"
 }
 
-order += "volume master"
 order += "wireless _first_"
-order += "ethernet _first_"
+order += "ethernet _first_" 
 order += "battery all"
 order += "disk /"
 order += "load"
 order += "memory"
-order += "tztime tokyo"
-order += "tztime london"
 order += "tztime local"
 
-volume master {
-        format = "♪: %volume"
-        format_muted = "♪: muted (%volume)"
-        device = "pulse"
-}
-
 wireless _first_ {
-        format_up = "W: (%quality at %essid) %ip"
-        format_down = "W: down"
+        format_up = "󰖩 %quality at %essid"
+        format_down = "󰖪 down"
 }
 
 ethernet _first_ {
-        format_up = "E: %ip (%speed)"
-        format_down = "E: down"
+        format_up = "󰈀 %ip"
+        format_down = "󰲜 down"
 }
 
 battery all {
-        format = "%status %percentage %remaining"
-        format_down = "No battery"
-        path = "/sys/class/power_supply/BAT%d/uevent"
-        status_chr = "⚡"
-        status_bat = "🔋"
-        status_unk = "?"
-        status_full = "✓"
-        low_threshold = 15
-        threshold_type = percentage
-        integer_battery_capacity = true
-        last_full_capacity = true
+        format = "%status %percentage"
+        status_chr = "󰂄"
+        status_bat = "󰁹"
+        status_full = "󰁹"
+        low_threshold = 10
 }
 
 disk "/" {
-        format = "💾 %avail"
+        format = "󰋊 %avail"
 }
 
 load {
-        format = "🔥 %1min"
+        format = "󰍛 %1min"
 }
 
 memory {
-        format = "🧠 %used / %total"
+        format = "󰘚 %used"
         threshold_degraded = "1G"
-        format_degraded = "MEMORY < %available"
-}
-
-tztime tokyo {
-        format = "🇯🇵 %H:%M"
-        timezone = "Asia/Tokyo"
-}
-
-tztime london {
-        format = "🇬🇧 %H:%M"
-        timezone = "Europe/London"
 }
 
 tztime local {
-        format = "📅 %Y-%m-%d 🕒 %H:%M:%S"
+        format = "󰃭 %Y-%m-%d %H:%M:%S"
 }
