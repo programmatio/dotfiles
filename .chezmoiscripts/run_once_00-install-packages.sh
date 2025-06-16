@@ -75,8 +75,10 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
         age \
         gh
     
-    # Install kitty on macOS
-    brew install --cask kitty
+    # Install kitty on macOS if not already installed
+    if ! command -v kitty &> /dev/null; then
+        brew install --cask kitty
+    fi
 fi
 
 # Install oh-my-zsh
