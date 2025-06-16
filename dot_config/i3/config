@@ -42,6 +42,9 @@ floating_modifier $mod
 # Start a terminal
 bindsym $mod+Return exec kitty
 
+# Launch browser  
+bindsym $mod+Shift+w exec --no-startup-id "i3-msg 'workspace number 2'; pgrep chromium || chromium"
+
 # Kill focused window
 bindsym $mod+Shift+q kill
 
@@ -183,6 +186,9 @@ bindsym XF86MonBrightnessDown exec brightnessctl set 10%-
 bindsym $mod+Shift+b exec blueman-manager
 bindsym $mod+Shift+v exec pavucontrol
 
+# Language switching
+bindsym Mod4+space exec fcitx5-remote -t
+
 # Screenshot bindings
 bindsym Print exec --no-startup-id maim "/home/$USER/Pictures/$(date +%Y-%m-%d_%H-%M-%S).png"
 bindsym $mod+Print exec --no-startup-id maim --window $(xdotool getactivewindow) "/home/$USER/Pictures/$(date +%Y-%m-%d_%H-%M-%S).png"
@@ -199,6 +205,7 @@ for_window [class="Blueman-manager"] floating enable
 for_window [class="Nm-connection-editor"] floating enable
 for_window [window_role="pop-up"] floating enable
 for_window [window_role="task_dialog"] floating enable
+assign [class="Chromium"] $ws2
 
 # Autostart applications
 exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock -c 1a1b26 --nofork

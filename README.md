@@ -2,6 +2,38 @@
 
 My personal dotfiles managed with [chezmoi](https://www.chezmoi.io/).
 
+## Quick Start (Fresh Machine)
+
+### Step 1: Install chezmoi and initialize
+```bash
+sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply programmatio
+```
+
+### Step 2: If using local directory instead
+```bash
+# Install chezmoi
+sh -c "$(curl -fsLS get.chezmoi.io)"
+
+# Clone your dotfiles repo
+git clone https://github.com/programmatio/dotfiles.git ~/personal/dotfiles
+
+# Initialize chezmoi with local source
+chezmoi init --source ~/personal/dotfiles --apply
+```
+
+### Step 3: Update dotfiles after making changes
+```bash
+# Add changed files
+chezmoi add ~/.config/i3/config
+chezmoi add ~/.zshrc
+
+# Commit and push
+cd ~/personal/dotfiles
+git add .
+git commit -m "Update configs"
+git push
+```
+
 ## Features
 
 - **Terminal**: Kitty with Tokyo Night theme
