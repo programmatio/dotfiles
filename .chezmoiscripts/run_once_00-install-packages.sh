@@ -1,6 +1,12 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
+
+# Error handler
+error_exit() {
+    echo "Error: $1" >&2
+    exit 1
+}
 
 echo "Installing required packages..."
 
@@ -73,12 +79,41 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
         fzf \
         fontconfig \
         age \
-        gh
+        gh \
+        jq
     
     # Install kitty on macOS if not already installed
     if ! command -v kitty &> /dev/null; then
         brew install --cask kitty
     fi
+    
+    # Install yabai window manager
+    echo "Installing yabai window manager..."
+    brew install koekeishiya/formulae/yabai
+    
+    # Install skhd hotkey daemon
+    echo "Installing skhd hotkey daemon..."
+    brew install koekeishiya/formulae/skhd
+    
+    # Install sketchybar for status bar
+    echo "Installing sketchybar..."
+    brew tap FelixKratz/formulae
+    brew install sketchybar
+    
+    # Install Raycast for application launcher (free alternative to Alfred)
+    echo "Installing Raycast..."
+    brew install --cask raycast
+    
+    # Start yabai and skhd services
+    echo "Starting yabai and skhd services..."
+    brew services start yabai
+    brew services start skhd
+    brew services start sketchybar
+    
+    # Note about SIP for advanced features
+    echo ""
+    echo "Note: For advanced yabai features (window opacity, borders), you may need to partially disable SIP."
+    echo "See: https://github.com/koekeishiya/yabai/wiki/Disabling-System-Integrity-Protection"
 fi
 
 # Install oh-my-zsh

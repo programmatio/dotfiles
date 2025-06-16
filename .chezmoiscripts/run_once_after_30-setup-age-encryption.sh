@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 set -e
 
 AGE_DIR="$HOME/.config/age"

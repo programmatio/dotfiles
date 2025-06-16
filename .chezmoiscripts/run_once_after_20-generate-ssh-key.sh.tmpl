@@ -12,7 +12,7 @@ chmod 700 "$SSH_DIR"
 # Generate SSH key if it doesn't exist
 if [ ! -f "$SSH_KEY" ]; then
     echo "Generating ED25519 SSH key..."
-    ssh-keygen -t ed25519 -C "max.spogis@gmail.com" -f "$SSH_KEY" -N ""
+    ssh-keygen -t ed25519 -C {{ .email | quote }} -f "$SSH_KEY" -N ""
     
     # Set proper permissions
     chmod 600 "$SSH_KEY"

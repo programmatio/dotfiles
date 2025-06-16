@@ -1,0 +1,13 @@
+{{- $email := promptStringOnce . "email" "Enter your email address" -}}
+{{- $name := promptStringOnce . "name" "Enter your full name" -}}
+
+[data]
+    email = {{ $email | quote }}
+    name = {{ $name | quote }}
+
+{{- if (stat (joinPath .chezmoi.homeDir ".config" "chezmoi" "key.txt")) }}
+encryption = "age"
+[age]
+    identity = "~/.config/chezmoi/key.txt"
+    recipient = "age1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p"
+{{- end }}

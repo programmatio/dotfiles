@@ -1,6 +1,6 @@
 [user]
-	name = Max
-	email = max.spogis@gmail.com
+	name = {{ .name | quote }}
+	email = {{ .email | quote }}
 
 [core]
 	editor = nvim
