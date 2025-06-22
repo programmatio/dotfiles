@@ -47,6 +47,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         wireplumber \
         pavucontrol \
         pasystray \
+        noto-fonts-emoji \
         playerctl \
         brightnessctl \
         network-manager-applet \
