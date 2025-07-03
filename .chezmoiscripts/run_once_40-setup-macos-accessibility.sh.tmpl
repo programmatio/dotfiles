@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+
+{{ if eq .chezmoi.os "darwin" -}}
+# Setup accessibility permissions for yabai and skhd on macOS
+
+set -e
+
+echo "🔧 Setting up macOS accessibility permissions for window management..."
+
+# Function to check if app has accessibility permissions
+check_accessibility() {
+    local app_path="$1"
+    local app_name="$(basename "$app_path")"
+    
+    # Check if the app is in accessibility list and enabled
+    if sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" \
+        "SELECT allowed FROM access WHERE service='kTCCServiceAccessibility' AND client='$app_path'" 2>/dev/null | grep -q 1; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Check yabai accessibility
+if command -v yabai &> /dev/null; then
+    YABAI_PATH=$(which yabai)
+    if ! check_accessibility "$YABAI_PATH" 2>/dev/null; then
+        echo "⚠️  yabai needs accessibility permissions!"
+        echo "   Please grant accessibility access to yabai:"
+        echo ""
+        echo "   1. Open System Settings → Privacy & Security → Accessibility"
+        echo "   2. Click the lock to make changes"
+        echo "   3. Click + and add: $YABAI_PATH"
+        echo "   4. Make sure the checkbox is enabled"
+        echo ""
+        
+        # Try to open accessibility settings
+        open "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
+    else
+        echo "✓ yabai has accessibility permissions"
+    fi
+fi
+
+# Check skhd accessibility
+if command -v skhd &> /dev/null; then
+    SKHD_PATH=$(which skhd)
+    if ! check_accessibility "$SKHD_PATH" 2>/dev/null; then
+        echo "⚠️  skhd needs accessibility permissions!"
+        echo "   Please grant accessibility access to skhd:"
+        echo ""
+        echo "   1. Open System Settings → Privacy & Security → Accessibility"
+        echo "   2. Click the lock to make changes"
+        echo "   3. Click + and add: $SKHD_PATH"
+        echo "   4. Make sure the checkbox is enabled"
+        echo ""
+    else
+        echo "✓ skhd has accessibility permissions"
+    fi
+fi
+
+# Also check for kitty if it's used as terminal
+if [ -d "/Applications/kitty.app" ]; then
+    if ! check_accessibility "/Applications/kitty.app" 2>/dev/null; then
+        echo ""
+        echo "💡 Tip: You may also want to grant accessibility permissions to kitty"
+        echo "   for better integration with the window manager"
+    fi
+fi
+
+echo ""
+echo "After granting permissions, restart the services:"
+echo "  skhd --restart-service"
+echo "  yabai --restart-service"
+echo ""
+{{ end -}}

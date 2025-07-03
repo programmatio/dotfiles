@@ -3,15 +3,9 @@
 # yabai configuration to mimic i3 setup
 # Based on Tokyo Night theme and i3 keybindings
 
-# Load scripting addition (for advanced features like opacity and borders)
-# Check if scripting addition is installed and load it
-if yabai --check-sa; then
-    echo "Scripting addition already loaded"
-else
-    echo "Loading scripting addition..."
-    sudo yabai --load-sa
-fi
-yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+# Skip scripting addition since SIP cannot be disabled
+echo "Running yabai without scripting addition (SIP enabled)"
+echo "Note: Window borders, opacity, and some focus commands won't work"
 
 # Global settings
 yabai -m config layout                       bsp
@@ -26,23 +20,17 @@ yabai -m config left_padding                 5   # Outer gap
 yabai -m config right_padding                5   # Outer gap
 yabai -m config window_gap                   10  # Inner gap
 
-# Window opacity (matching picom settings)
-# Only enable if scripting addition is loaded
-if yabai --check-sa &> /dev/null; then
-    yabai -m config window_opacity               on
-    yabai -m config active_window_opacity        1.0
-    yabai -m config normal_window_opacity        0.95
-    yabai -m config window_opacity_duration      0.0
-    
-    # Window borders (Tokyo Night theme colors)
-    yabai -m config window_border                on
-    yabai -m config window_border_width          2
-    yabai -m config active_window_border_color   0xff7aa2f7  # Tokyo Night blue
-    yabai -m config normal_window_border_color   0xff24283b  # Tokyo Night dark
-    yabai -m config insert_feedback_color        0xff9ece6a  # Tokyo Night green
-else
-    echo "Scripting addition not loaded - skipping opacity and border settings"
-fi
+# Window opacity and borders disabled (requires SIP disabled)
+# These settings are commented out since SIP cannot be disabled
+# yabai -m config window_opacity               on
+# yabai -m config active_window_opacity        1.0
+# yabai -m config normal_window_opacity        0.95
+# yabai -m config window_opacity_duration      0.0
+# yabai -m config window_border                on
+# yabai -m config window_border_width          2
+# yabai -m config active_window_border_color   0xff7aa2f7  # Tokyo Night blue
+# yabai -m config normal_window_border_color   0xff24283b  # Tokyo Night dark
+# yabai -m config insert_feedback_color        0xff9ece6a  # Tokyo Night green
 
 # Mouse settings (Alt as modifier, matching i3)
 yabai -m config mouse_modifier               alt
