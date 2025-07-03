@@ -131,20 +131,18 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     if ! pgrep -x "yabai" > /dev/null; then
         echo "Starting yabai service..."
         yabai --start-service 2>/dev/null || true
-        brew services start yabai 2>/dev/null || true
     else
         echo "Restarting yabai service to load new configuration..."
-        brew services restart yabai 2>/dev/null || true
+        yabai --restart-service 2>/dev/null || true
     fi
     
     # Start or restart skhd service  
     if ! pgrep -x "skhd" > /dev/null; then
         echo "Starting skhd service..."
         skhd --start-service 2>/dev/null || true
-        brew services start skhd 2>/dev/null || true
     else
         echo "Restarting skhd service to load new configuration..."
-        brew services restart skhd 2>/dev/null || true
+        skhd --restart-service 2>/dev/null || true
     fi
     
     # Start or restart sketchybar service
