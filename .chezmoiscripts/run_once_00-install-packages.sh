@@ -139,10 +139,13 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     # Start or restart skhd service  
     if ! pgrep -x "skhd" > /dev/null; then
         echo "Starting skhd service..."
+        # Kill any stale processes first
+        pkill -f skhd 2>/dev/null || true
+        sleep 1
         skhd --start-service 2>/dev/null || true
     else
         echo "Restarting skhd service to load new configuration..."
-        skhd --restart-service 2>/dev/null || true
+        skhd --restart-service 2>/dev/null || (pkill -f skhd && sleep 1 && skhd --start-service) 2>/dev/null || true
     fi
     
     # Start or restart sketchybar service
