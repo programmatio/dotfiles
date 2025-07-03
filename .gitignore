@@ -22,3 +22,6 @@ Thumbs.db
 **/age/key.txt
 .config/age/
 age-key.txt
+
+# Binary files
+bin/chezmoi
