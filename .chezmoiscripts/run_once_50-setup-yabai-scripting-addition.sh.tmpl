@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+{{ if eq .chezmoi.os "darwin" -}}
+# Setup yabai scripting addition on macOS
+# This enables advanced features like window borders, opacity, and focus control
+
+set -e
+
+echo "Setting up yabai scripting addition..."
+
+# Check if yabai is installed
+if ! command -v yabai &> /dev/null; then
+    echo "yabai is not installed, skipping scripting addition setup"
+    exit 0
+fi
+
+# Check current SIP status
+if csrutil status | grep -q "enabled"; then
+    echo "⚠️  System Integrity Protection (SIP) is fully enabled."
+    echo "   To use yabai's advanced features, you need to partially disable SIP:"
+    echo ""
+    echo "   1. Reboot into Recovery Mode:"
+    echo "      - Intel Mac: Hold Cmd+R during startup"
+    echo "      - Apple Silicon: Hold power button during startup"
+    echo ""
+    echo "   2. Open Terminal in Recovery Mode and run:"
+    echo "      csrutil enable --without fs --without debug --without nvram"
+    echo ""
+    echo "   3. Reboot and run this script again"
+    echo ""
+    echo "   Note: This is safe and only disables specific SIP features needed by yabai"
+    exit 0
+fi
+
+# Install scripting addition if not already installed
+if ! sudo yabai --check-sa &> /dev/null; then
+    echo "Installing yabai scripting addition..."
+    sudo yabai --install-sa
+    
+    # Load the scripting addition
+    echo "Loading yabai scripting addition..."
+    sudo yabai --load-sa
+else
+    echo "Yabai scripting addition is already installed and loaded"
+fi
+
+# Verify installation
+if sudo yabai --check-sa; then
+    echo "✓ Yabai scripting addition is working correctly"
+else
+    echo "✗ Failed to setup yabai scripting addition"
+    exit 1
+fi
+
+echo "Yabai scripting addition setup complete!"
+{{ end -}}
