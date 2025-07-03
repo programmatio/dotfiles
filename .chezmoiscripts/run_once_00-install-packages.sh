@@ -58,7 +58,10 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         github-cli \
         noto-fonts-cjk \
         fcitx5-im \
-        fcitx5-mozc
+        fcitx5-mozc \
+        nodejs \
+        npm \
+        go
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS
     echo "Detected macOS system"
@@ -70,7 +73,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     fi
     
     # Install packages only if not already installed
-    for package in curl wget git zsh tmux neovim ripgrep fzf fontconfig age gh jq; do
+    for package in curl wget git zsh tmux neovim ripgrep fzf fontconfig age gh jq node go; do
         if ! brew list --formula | grep -q "^${package}$"; then
             echo "Installing ${package}..."
             brew install ${package}

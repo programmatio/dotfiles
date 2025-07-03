@@ -93,7 +93,7 @@ require("lazy").setup({
     config = function()
       require("mason").setup()
       require("mason-lspconfig").setup({
-        ensure_installed = { "lua_ls", "tsserver", "pyright", "gopls", "rust_analyzer" },
+        ensure_installed = { "lua_ls", "ts_ls", "pyright", "gopls", "rust_analyzer" },
       })
 
       local lspconfig = require("lspconfig")
@@ -101,7 +101,7 @@ require("lazy").setup({
 
       -- Setup LSP servers
       lspconfig.lua_ls.setup({ capabilities = capabilities })
-      lspconfig.tsserver.setup({ capabilities = capabilities })
+      lspconfig.ts_ls.setup({ capabilities = capabilities })
       lspconfig.pyright.setup({ capabilities = capabilities })
       lspconfig.gopls.setup({ capabilities = capabilities })
       lspconfig.rust_analyzer.setup({ capabilities = capabilities })
