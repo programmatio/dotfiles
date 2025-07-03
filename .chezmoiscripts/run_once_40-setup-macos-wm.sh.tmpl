@@ -1,0 +1,59 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/bin/bash
+
+set -euo pipefail
+
+echo "Setting up macOS window management..."
+
+# Check if yabai and skhd are installed
+if ! command -v yabai &> /dev/null || ! command -v skhd &> /dev/null; then
+    echo "Error: yabai or skhd not installed. Please run package installation first."
+    exit 1
+fi
+
+# Disable secure keyboard entry if enabled
+if defaults read -g AppleSecureKeyboardEntryEnabled 2>/dev/null | grep -q "1"; then
+    echo "Disabling secure keyboard entry (blocks skhd)..."
+    defaults write -g AppleSecureKeyboardEntryEnabled -bool false
+    echo "Secure keyboard entry disabled. You may need to restart your terminal."
+fi
+
+# Start services if not running
+echo "Ensuring yabai and skhd services are started..."
+
+# Check if yabai is running
+if ! pgrep -x "yabai" > /dev/null; then
+    echo "Starting yabai..."
+    brew services start yabai || yabai --start-service
+fi
+
+# Check if skhd is running
+if ! pgrep -x "skhd" > /dev/null; then
+    echo "Starting skhd..."
+    brew services start skhd || skhd --start-service
+fi
+
+# Check if sketchybar is running
+if ! pgrep -x "sketchybar" > /dev/null; then
+    echo "Starting sketchybar..."
+    brew services start sketchybar || true
+fi
+
+# Show current service status
+echo ""
+echo "Current service status:"
+brew services list | grep -E "yabai|skhd|sketchybar" || true
+
+# Remind about accessibility permissions
+echo ""
+echo "IMPORTANT: Make sure to grant accessibility permissions to:"
+echo "  1. System Preferences > Security & Privacy > Privacy > Accessibility"
+echo "  2. Add and enable: skhd, yabai, and your terminal app (Terminal/iTerm2/kitty)"
+echo ""
+echo "If shortcuts still don't work:"
+echo "  1. Make sure secure keyboard entry is disabled in your terminal"
+echo "  2. Try restarting the services: brew services restart skhd && brew services restart yabai"
+echo "  3. Check logs: tail -f /tmp/skhd_*.err.log"
+
+echo "macOS window management setup complete!"
+{{- end -}}

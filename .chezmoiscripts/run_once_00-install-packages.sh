@@ -108,14 +108,24 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     # Start yabai and skhd services
     echo "Starting yabai and skhd services..."
     
-    # yabai requires manual start command first
-    echo "Note: yabai requires additional setup on first install."
-    echo "Please run the following commands manually:"
-    echo "  yabai --start-service"
-    echo "  skhd --start-service"
+    # Start yabai service
+    echo "Configuring yabai service..."
+    yabai --start-service || true
+    
+    # Start skhd service
+    echo "Configuring skhd service..."
+    skhd --start-service || true
+    
+    # Use brew services to ensure they're running
+    echo "Starting services with brew..."
+    brew services start yabai || true
+    brew services start skhd || true
+    brew services start sketchybar || true
+    
+    # Verify services are running
     echo ""
-    echo "Then start the services:"
-    echo "  brew services start sketchybar"
+    echo "Service status:"
+    brew services list | grep -E "yabai|skhd|sketchybar" || true
     
     # Note about SIP for advanced features
     echo ""
