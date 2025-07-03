@@ -69,58 +69,92 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     fi
     
-    brew install \
-        curl \
-        wget \
-        git \
-        zsh \
-        tmux \
-        neovim \
-        ripgrep \
-        fzf \
-        fontconfig \
-        age \
-        gh \
-        jq
+    # Install packages only if not already installed
+    for package in curl wget git zsh tmux neovim ripgrep fzf fontconfig age gh jq; do
+        if ! brew list --formula | grep -q "^${package}$"; then
+            echo "Installing ${package}..."
+            brew install ${package}
+        else
+            echo "${package} is already installed"
+        fi
+    done
     
     # Install kitty on macOS if not already installed
     if ! command -v kitty &> /dev/null; then
+        echo "Installing kitty..."
         brew install --cask kitty
+    else
+        echo "kitty is already installed"
     fi
     
     # Install yabai window manager
-    echo "Installing yabai window manager..."
-    brew install koekeishiya/formulae/yabai
+    if ! brew list --formula | grep -q "^yabai$"; then
+        echo "Installing yabai window manager..."
+        brew install koekeishiya/formulae/yabai
+    else
+        echo "yabai is already installed"
+    fi
     
     # Install skhd hotkey daemon
-    echo "Installing skhd hotkey daemon..."
-    brew install koekeishiya/formulae/skhd
+    if ! brew list --formula | grep -q "^skhd$"; then
+        echo "Installing skhd hotkey daemon..."
+        brew install koekeishiya/formulae/skhd
+    else
+        echo "skhd is already installed"
+    fi
     
     # Install sketchybar for status bar
     echo "Installing sketchybar..."
     brew tap FelixKratz/formulae
-    brew install sketchybar
+    
+    # Handle potential SwiftBridging module errors by building from source
+    if ! brew list sketchybar &>/dev/null; then
+        echo "Installing SketchyBar from source to avoid SwiftBridging errors..."
+        brew install --build-from-source FelixKratz/formulae/sketchybar
+    else
+        echo "SketchyBar already installed, checking for updates..."
+        brew upgrade FelixKratz/formulae/sketchybar || true
+    fi
     
     # Install Raycast for application launcher (free alternative to Alfred)
-    echo "Installing Raycast..."
-    brew install --cask raycast
+    if ! brew list --cask | grep -q "^raycast$"; then
+        echo "Installing Raycast..."
+        brew install --cask raycast
+    else
+        echo "Raycast is already installed"
+    fi
     
     # Start yabai and skhd services
-    echo "Starting yabai and skhd services..."
+    echo "Configuring macOS window management services..."
     
-    # Start yabai service
-    echo "Configuring yabai service..."
-    yabai --start-service || true
+    # Start or restart yabai service
+    if ! pgrep -x "yabai" > /dev/null; then
+        echo "Starting yabai service..."
+        yabai --start-service 2>/dev/null || true
+        brew services start yabai 2>/dev/null || true
+    else
+        echo "Restarting yabai service to load new configuration..."
+        brew services restart yabai 2>/dev/null || true
+    fi
     
-    # Start skhd service
-    echo "Configuring skhd service..."
-    skhd --start-service || true
+    # Start or restart skhd service  
+    if ! pgrep -x "skhd" > /dev/null; then
+        echo "Starting skhd service..."
+        skhd --start-service 2>/dev/null || true
+        brew services start skhd 2>/dev/null || true
+    else
+        echo "Restarting skhd service to load new configuration..."
+        brew services restart skhd 2>/dev/null || true
+    fi
     
-    # Use brew services to ensure they're running
-    echo "Starting services with brew..."
-    brew services start yabai || true
-    brew services start skhd || true
-    brew services start sketchybar || true
+    # Start or restart sketchybar service
+    if ! pgrep -x "sketchybar" > /dev/null; then
+        echo "Starting sketchybar service..."
+        brew services start sketchybar 2>/dev/null || true
+    else
+        echo "Restarting sketchybar service to load new configuration..."
+        brew services restart sketchybar 2>/dev/null || true
+    fi
     
     # Verify services are running
     echo ""
