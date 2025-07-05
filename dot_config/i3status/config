@@ -26,10 +26,18 @@ ethernet _first_ {
 
 battery all {
         format = "%status %percentage"
+        format_down = "No battery"
         status_chr = "󰂄"
         status_bat = "󰁹"
+        status_unk = "?"
         status_full = "󰁹"
-        low_threshold = 10
+        low_threshold = 20
+        threshold_type = "percentage"
+        integer_battery_capacity = true
+        # Colors will change based on battery level
+        color_good = "#00FF00"
+        color_degraded = "#FFFF00"
+        color_bad = "#FF0000"
 }
 
 disk "/" {
