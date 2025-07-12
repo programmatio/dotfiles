@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# Custom brightness control script with adjustable minimum
+# Allows setting a lower minimum brightness while keeping maximum at 100%
+
+# Configuration
+MIN_BRIGHTNESS=1    # Minimum brightness percentage (1% instead of 10%)
+MAX_BRIGHTNESS=100  # Maximum brightness percentage
+STEP=2             # Step size for adjustments
+
+# Get current brightness percentage
+current=$(brightnessctl get)
+max=$(brightnessctl max)
+current_percent=$((current * 100 / max))
+
+case "$1" in
+    "up")
+        # Increase brightness by STEP
+        new_percent=$((current_percent + STEP))
+        # Cap at maximum
+        if [ $new_percent -gt $MAX_BRIGHTNESS ]; then
+            new_percent=$MAX_BRIGHTNESS
+        fi
+        ;;
+    "down")
+        # Decrease brightness by STEP
+        new_percent=$((current_percent - STEP))
+        # Don't go below minimum
+        if [ $new_percent -lt $MIN_BRIGHTNESS ]; then
+            new_percent=$MIN_BRIGHTNESS
+        fi
+        ;;
+    *)
+        echo "Usage: $0 {up|down}"
+        exit 1
+        ;;
+esac
+
+# Apply the new brightness
+brightnessctl set "${new_percent}%"
