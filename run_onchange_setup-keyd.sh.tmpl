@@ -1,0 +1,38 @@
+#!/bin/bash
+
+{{ if eq .chezmoi.os "linux" -}}
+{{ if eq .chezmoi.osRelease.id "arch" -}}
+
+# This script runs when the keyd config changes
+# hash: {{ include "private_etc/private_keyd/default.conf" | sha256sum }}
+
+echo "Setting up keyd configuration..."
+
+# Copy keyd config (requires sudo)
+sudo cp /etc/keyd/default.conf /etc/keyd/default.conf.bak 2>/dev/null || true
+sudo cp ~/.local/share/chezmoi/private_etc/private_keyd/default.conf /etc/keyd/default.conf
+
+# Enable and start/restart keyd service
+sudo systemctl enable keyd
+
+# Check if keyd is running, if not start it, otherwise restart it
+if systemctl is-active --quiet keyd; then
+    echo "Restarting keyd service..."
+    sudo systemctl restart keyd
+else
+    echo "Starting keyd service..."
+    sudo systemctl start keyd
+fi
+
+# Verify keyd is running
+if systemctl is-active --quiet keyd; then
+    echo "✓ keyd service is running"
+else
+    echo "✗ Failed to start keyd service"
+    systemctl status keyd
+fi
+
+echo "Keyd configuration updated and service restarted"
+
+{{ end -}}
+{{ end -}}

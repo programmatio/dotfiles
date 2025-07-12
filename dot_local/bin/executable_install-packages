@@ -1,0 +1,90 @@
+#!/bin/bash
+
+# Install packages for dotfiles setup
+
+{{ if eq .chezmoi.os "linux" -}}
+{{ if eq .chezmoi.osRelease.id "arch" -}}
+echo "Installing packages for Arch Linux..."
+
+# Update system
+sudo pacman -Syu --noconfirm
+
+# Install essential packages
+sudo pacman -S --needed --noconfirm \
+    base-devel \
+    git \
+    curl \
+    wget \
+    neovim \
+    tmux \
+    kitty \
+    zsh \
+    i3-wm \
+    i3status \
+    i3lock \
+    rofi \
+    dunst \
+    picom \
+    feh \
+    maim \
+    xclip \
+    pavucontrol \
+    bluez \
+    bluez-utils \
+    blueman \
+    network-manager-applet \
+    polkit-gnome \
+    ttf-jetbrains-mono-nerd \
+    pipewire \
+    pipewire-pulse \
+    pipewire-alsa \
+    wireplumber \
+    keyd
+
+# Enable and start keyd service
+sudo systemctl enable keyd
+sudo systemctl start keyd
+
+# Create keyd configuration directory
+sudo mkdir -p /etc/keyd
+
+# Install yay (AUR helper) if not installed
+if ! command -v yay &> /dev/null; then
+    echo "Installing yay..."
+    git clone https://aur.archlinux.org/yay.git /tmp/yay
+    cd /tmp/yay
+    makepkg -si --noconfirm
+    cd -
+    rm -rf /tmp/yay
+fi
+
+# Install AUR packages
+yay -S --needed --noconfirm \
+    pasystray
+
+{{ end -}}
+{{ else if eq .chezmoi.os "darwin" -}}
+echo "Installing packages for macOS..."
+
+# Install Homebrew if not installed
+if ! command -v brew &> /dev/null; then
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+
+# Install packages
+brew install \
+    neovim \
+    tmux \
+    kitty \
+    zsh \
+    git \
+    curl \
+    wget
+
+# Install cask applications
+brew install --cask \
+    font-jetbrains-mono-nerd-font
+
+{{ end -}}
+
+echo "Package installation complete!"

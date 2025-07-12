@@ -88,6 +88,8 @@ chezmoi init --apply programmatio
 - `Mod+x` - Lock screen
 
 ### Mac-like Keybindings (Cmd = Super/Windows key)
+**Note:** These keybindings are implemented system-wide using `keyd` on Linux.
+Configuration file: `/etc/keyd/default.conf`
 **Text Editing:**
 - `Cmd+A` - Select all
 - `Cmd+C` - Copy
