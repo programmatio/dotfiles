@@ -24,6 +24,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         ripgrep \
         fzf \
         base-devel \
+        keyd \
         unzip \
         fontconfig \
         xclip \
