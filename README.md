@@ -88,6 +88,7 @@ chezmoi init --apply programmatio
 - **Brightnessctl** - Display brightness control
 - **GitHub CLI** - Automatic SSH key registration for new machines
 - **Age encryption** - Secure storage for sensitive files
+- **Shortcuts Help** - Vimium-style overlay showing all keyboard shortcuts
 
 ## Key Bindings
 
@@ -98,12 +99,14 @@ chezmoi init --apply programmatio
 - `Mod+Shift+h/j/k/l` - Move windows
 - `Mod+1-0` - Switch workspaces
 - `Mod+Shift+q` - Close window
+- `Mod+?` - Show shortcuts help overlay
 
 ### Tmux (Prefix = Ctrl+a)
 - `Ctrl+a |` - Split vertically
 - `Ctrl+a -` - Split horizontally
 - `Ctrl+a h/j/k/l` - Navigate panes
 - `Ctrl+f` - Tmux sessionizer
+- `Ctrl+a ?` - Show shortcuts help overlay
 
 ### Neovim (Leader = Space)
 - `<leader>ff` - Find files
@@ -111,6 +114,10 @@ chezmoi init --apply programmatio
 - `<leader>e` - File explorer
 - `gd` - Go to definition
 - `K` - Hover documentation
+
+### Global Shortcuts
+- `Ctrl+?` - Show shortcuts help (in terminal)
+- `shortcuts-help` - Show shortcuts help (command)
 
 ## Repository Structure
 

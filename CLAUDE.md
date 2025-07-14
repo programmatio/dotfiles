@@ -58,6 +58,7 @@ age -d ~/.config/chezmoi/key.txt.age
 ├── dot_local/bin/             # Maps to ~/.local/bin/
 │   ├── executable_brightness-control
 │   ├── executable_github-setup
+│   ├── executable_shortcuts-help
 │   └── executable_tmux-sessionizer
 ├── dot_gitconfig.tmpl         # Git configuration with templates
 ├── dot_tmux.conf              # Tmux multiplexer config
@@ -111,4 +112,5 @@ age -d ~/.config/chezmoi/key.txt.age
 - Migrated from `run_once_` to `run_onchange_` for package/font scripts
 - Added `.chezmoiignore` to exclude documentation from home directory
 - Added `.chezmoiremove` to clean up old macOS configurations
+- Added `shortcuts-help` - Vimium-style overlay showing all shortcuts
 

@@ -128,5 +128,8 @@ extract() {
 # Tmux sessionizer binding
 bindkey -s ^f "tmux-sessionizer\n"
 
+# Shortcuts help binding (Ctrl+?)
+bindkey -s '^_' "shortcuts-help\n"
+
 # Load local zsh config if exists
 [ -f ~/.zshrc.local ] && source ~/.zshrc.local

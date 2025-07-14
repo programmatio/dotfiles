@@ -163,6 +163,9 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
+# Show shortcuts help
+bindsym $mod+question exec shortcuts-help
+
 
 # Media player controls
 bindsym XF86AudioPlay exec playerctl play-pause
