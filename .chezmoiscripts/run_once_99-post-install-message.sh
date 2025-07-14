@@ -10,31 +10,12 @@ echo "║                    Dotfiles Installation Complete!                  �
 echo "╚════════════════════════════════════════════════════════════════════╝"
 echo ""
 
-# Platform-specific instructions
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    echo "🍎 macOS Setup Instructions:"
-    echo ""
-    echo "1. ACCESSIBILITY PERMISSIONS (Required for window management):"
-    echo "   - Open System Settings → Privacy & Security → Accessibility"
-    echo "   - Add and enable: yabai, skhd, and kitty"
-    echo "   - Without this, window focus commands won't work!"
-    echo ""
-    echo "2. Start window management services:"
-    echo "   brew services start yabai"
-    echo "   brew services start skhd"
-    echo "   brew services start sketchybar"
-    echo ""
-    echo "3. Optional: For advanced features (borders, opacity):"
-    echo "   - Partially disable SIP (requires reboot to Recovery Mode)"
-    echo "   - Run: csrutil enable --without fs --without debug --without nvram"
-    echo ""
-elif [[ -f /etc/arch-release ]]; then
-    echo "🐧 Arch Linux Setup Instructions:"
-    echo ""
-    echo "1. Start window manager:"
-    echo "   - Log out and select i3 from your display manager"
-    echo ""
-fi
+# Arch Linux setup instructions
+echo "🐧 Arch Linux Setup Instructions:"
+echo ""
+echo "1. Start window manager:"
+echo "   - Log out and select i3 from your display manager"
+echo ""
 
 echo "📝 Common Next Steps:"
 echo ""

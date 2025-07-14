@@ -4,12 +4,8 @@ set -e
 
 echo "Installing JetBrainsMono Nerd Font..."
 
-# Create fonts directory based on OS
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    FONT_DIR="$HOME/Library/Fonts"
-else
-    FONT_DIR="$HOME/.local/share/fonts"
-fi
+# Create fonts directory
+FONT_DIR="$HOME/.local/share/fonts"
 mkdir -p "$FONT_DIR"
 
 # Check if font is already installed
@@ -44,14 +40,8 @@ cp JetBrainsMono/*.ttf "$FONT_DIR/"
 rm -rf JetBrainsMono.zip JetBrainsMono
 
 # Update font cache
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    # macOS doesn't need font cache update
-    echo "Font installed to ~/Library/Fonts"
-else
-    # Linux font cache update
-    if command -v fc-cache &> /dev/null; then
-        fc-cache -fv "$FONT_DIR/"
-    fi
+if command -v fc-cache &> /dev/null; then
+    fc-cache -fv "$FONT_DIR/"
 fi
 
 echo "JetBrainsMono Nerd Font ${LATEST_VERSION} installed successfully!"

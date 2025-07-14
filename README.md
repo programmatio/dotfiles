@@ -53,9 +53,6 @@ Install chezmoi first:
 ```bash
 # Arch Linux
 sudo pacman -S chezmoi
-
-# macOS
-brew install chezmoi
 ```
 
 ### Deploy dotfiles
@@ -70,7 +67,7 @@ chezmoi init --apply programmatio
 - **Zsh** - Shell with Oh My Zsh framework
 - **Neovim** - Text editor with LSP support
 - **Tmux** - Terminal multiplexer with sessionizer
-- **i3** - Tiling window manager (Arch Linux only)
+- **i3** - Tiling window manager
 - **Git** - Version control configuration
 - **Bluetooth & Audio** - Auto-configured for Arch Linux
 - **GitHub CLI** - Automatic SSH key registration for new machines
@@ -100,10 +97,9 @@ chezmoi init --apply programmatio
 - `gd` - Go to definition
 - `K` - Hover documentation
 
-## Supported Systems
+## Supported System
 
 - Arch Linux
-- macOS
 
 ## New Machine Setup
 

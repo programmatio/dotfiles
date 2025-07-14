@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-This is a dotfiles repository managed by chezmoi, providing automated setup for development environments on Arch Linux and macOS. The repository uses age encryption for sensitive files and includes automated package installation and configuration.
+This is a dotfiles repository managed by chezmoi, providing automated setup for development environments on Arch Linux. The repository uses age encryption for sensitive files and includes automated package installation and configuration.
 
 ## Essential Commands
 
@@ -56,10 +56,9 @@ age -d ~/.config/chezmoi/key.txt.age
 4. Age encryption setup (`30-setup-age-encryption.sh`)
 5. Post-install instructions (`99-post-install-message.sh`)
 
-### Cross-Platform Handling
-- Scripts detect OS using `chezmoi.os` and `chezmoi.osRelease.id`
-- Conditional package installation for Arch vs macOS
-- Platform-specific configurations in templates
+### OS Detection
+- Scripts use `chezmoi.os` and `chezmoi.osRelease.id` for OS detection
+- Package installation scripts are optimized for Arch Linux
 
 ## Critical Implementation Notes
 
@@ -69,27 +68,3 @@ age -d ~/.config/chezmoi/key.txt.age
 - Template variables available: `{{ .chezmoi.username }}`, `{{ .email }}`, etc.
 - Scripts in `.chezmoiscripts/` must be idempotent due to `run_once_` prefix
 
-## macOS Window Management (Yabai/SKHD)
-
-### Configuration Files
-- **`dot_config/yabai/executable_yabairc`** - Yabai window manager config (mimics i3)
-- **`dot_config/skhd/skhdrc`** - Hotkey daemon config (replicates i3 keybindings)
-- **`dot_config/sketchybar/`** - Status bar configuration (mimics i3bar)
-
-### Key Differences from i3
-- Uses Alt (Option) as modifier key to match i3 config
-- Binary Space Partitioning (BSP) instead of i3's manual tiling
-- macOS "Spaces" instead of i3 workspaces
-- Some features require partial SIP disable (borders, opacity)
-
-### Testing Yabai/SKHD Changes
-```bash
-# Reload configurations
-yabai --restart-service
-skhd --restart-service
-brew services restart sketchybar
-
-# Debug issues
-tail -f /tmp/yabai_*.err.log
-tail -f /tmp/skhd_*.err.log
-```
