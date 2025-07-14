@@ -1,0 +1,16 @@
+# Documentation files
+README.md
+CLAUDE.md
+ENCRYPTION.md
+
+# Git directory
+.git/
+
+# Local settings
+.claude/
+
+# GitHub workflows (if any)
+.github/
+
+# License file (if any)
+LICENSE

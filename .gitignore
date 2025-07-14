@@ -25,3 +25,6 @@ age-key.txt
 
 # Binary files
 bin/chezmoi
+
+# Neovim plugin lock file
+dot_config/nvim/lazy-lock.json

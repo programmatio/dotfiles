@@ -29,7 +29,6 @@ sudo pacman -Syu --noconfirm \
     i3-wm \
     i3status \
     i3blocks \
-    i3lock \
     dmenu \
     rofi \
     dunst \

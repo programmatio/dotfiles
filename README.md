@@ -63,13 +63,29 @@ chezmoi init --apply programmatio
 
 ## What's included
 
-- **Kitty** - GPU-based terminal emulator
-- **Zsh** - Shell with Oh My Zsh framework
-- **Neovim** - Text editor with LSP support
+### Core Applications
+- **Kitty** - GPU-based terminal emulator with Tokyo Night theme
+- **Zsh** - Shell with Oh My Zsh framework and plugins
+- **Neovim** - Text editor with LSP support and modern plugins
 - **Tmux** - Terminal multiplexer with sessionizer
-- **i3** - Tiling window manager
-- **Git** - Version control configuration
+- **Git** - Version control with custom configuration
+
+### Window Management (i3 Desktop Environment)
+- **i3** - Tiling window manager with gaps and custom keybindings
+- **Rofi** - Application launcher and window switcher
+- **Picom** - Compositor for window transparency and effects
+- **Dunst** - Notification daemon for desktop notifications
+- **i3status/i3blocks** - Status bar with system information
+
+### Audio & Media
+- **PipeWire** - Modern audio server with ALSA/JACK/Pulse compatibility
+- **Pavucontrol** - Audio control interface
+- **Playerctl** - Media player control
+
+### System Tools
 - **Bluetooth & Audio** - Auto-configured for Arch Linux
+- **Network Manager** - Network connection management
+- **Brightnessctl** - Display brightness control
 - **GitHub CLI** - Automatic SSH key registration for new machines
 - **Age encryption** - Secure storage for sensitive files
 
@@ -82,7 +98,6 @@ chezmoi init --apply programmatio
 - `Mod+Shift+h/j/k/l` - Move windows
 - `Mod+1-0` - Switch workspaces
 - `Mod+Shift+q` - Close window
-- `Mod+x` - Lock screen
 
 ### Tmux (Prefix = Ctrl+a)
 - `Ctrl+a |` - Split vertically
@@ -96,6 +111,43 @@ chezmoi init --apply programmatio
 - `<leader>e` - File explorer
 - `gd` - Go to definition
 - `K` - Hover documentation
+
+## Repository Structure
+
+```
+.
+├── .chezmoiscripts/           # Scripts that run during chezmoi apply
+│   ├── run_onchange_*         # Run when script content changes
+│   └── run_once_*             # Run only once
+├── .chezmoitemplates/         # Reusable template snippets
+├── dot_config/                # ~/.config directory
+│   ├── dunst/                 # Notification daemon config
+│   ├── fontconfig/            # Font configuration
+│   ├── i3/                    # i3 window manager
+│   ├── i3status/              # i3 status bar
+│   ├── kitty/                 # Terminal emulator
+│   ├── nvim/                  # Neovim configuration
+│   ├── picom/                 # Compositor config
+│   └── rofi/                  # Application launcher
+├── dot_local/                 # ~/.local directory
+│   └── bin/                   # User scripts
+│       ├── executable_*       # Scripts with execute permission
+├── dot_gitconfig.tmpl         # Git configuration template
+├── dot_tmux.conf              # Tmux configuration
+├── dot_zshrc                  # Zsh shell configuration
+├── .chezmoi.toml.tmpl         # Chezmoi config template
+├── .chezmoiignore             # Files to ignore during apply
+└── .chezmoiremove             # Files to remove during apply
+```
+
+### Chezmoi Naming Conventions
+
+- **`dot_`** prefix: Creates dotfiles (e.g., `dot_zshrc` → `~/.zshrc`)
+- **`executable_`** prefix: Sets execute permission on files
+- **`.tmpl`** suffix: Template files processed by chezmoi
+- **`run_onchange_`**: Scripts that run when their content changes
+- **`run_once_`**: Scripts that run only once per machine
+- **`private_`** prefix: Creates files with 600 permissions (not used currently)
 
 ## Supported System
 

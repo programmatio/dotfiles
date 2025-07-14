@@ -1,0 +1,15 @@
+# macOS-specific configurations that were removed
+.config/yabai/
+.config/skhd/
+.config/sketchybar/
+
+# Old i3lock configuration (if it exists)
+.config/i3lock/
+
+# Neovim files that might have been created by the old setup
+.config/nvim/neoconf.json
+.config/nvim/README.md
+.config/nvim/LICENSE
+
+# Old battery script
+.config/i3/battery-bling.sh
