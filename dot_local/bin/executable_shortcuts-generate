@@ -57,7 +57,12 @@ local i3_lines = {
 
 for key, binding in pairs(shortcuts.i3.bindings) do
   local desc, cmd = binding[1], binding[2]
-  table.insert(i3_lines, "bindsym $mod+" .. key .. " " .. cmd)
+  local no_mod = binding.no_mod or (type(binding[3]) == "table" and binding[3].no_mod)
+  if no_mod then
+    table.insert(i3_lines, "bindsym " .. key .. " " .. cmd)
+  else
+    table.insert(i3_lines, "bindsym $mod+" .. key .. " " .. cmd)
+  end
 end
 
 write_file(home .. "/.config/shortcuts/generated/i3-keybindings.conf",

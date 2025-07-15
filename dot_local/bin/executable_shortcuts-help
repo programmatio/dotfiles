@@ -16,124 +16,90 @@ end
 
 local shortcuts = dofile(shortcuts_file)
 
--- Colors for terminal output
-local colors = {
-  title = "\27[1;36m",    -- Bold Cyan
-  section = "\27[1;33m",  -- Bold Yellow  
-  key = "\27[1;32m",      -- Bold Green
-  desc = "\27[0m",        -- Normal
-  reset = "\27[0m"
-}
-
--- Format a key binding for display
-local function format_binding(key, desc, prefix)
-  if prefix then
-    key = "Prefix " .. key
-  end
-  return string.format("  %s%-15s%s %s", colors.key, key, colors.desc, desc)
+-- Function to escape special characters for Pango markup
+local function escape_markup(str)
+  return str:gsub("&", "&amp;")
+            :gsub("<", "&lt;")
+            :gsub(">", "&gt;")
+            :gsub("\"", "&quot;")
+            :gsub("'", "&apos;")
 end
 
--- Generate help text
-local function generate_help()
-  local lines = {}
-  
-  -- Header
-  table.insert(lines, colors.title .. "╔════════════════════════════════════════════════════════════════════════╗")
-  table.insert(lines, colors.title .. "║                           SHORTCUTS REFERENCE                          ║")
-  table.insert(lines, colors.title .. "╚════════════════════════════════════════════════════════════════════════╝")
-  table.insert(lines, "")
-  
-  -- TMUX section
-  table.insert(lines, colors.section .. "━━━ TMUX (Prefix: " .. shortcuts.tmux.prefix .. ") ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-  for key, binding in pairs(shortcuts.tmux.bindings) do
-    local desc = binding[1]
-    local prefix = binding.prefix or (binding[3] and binding[3].prefix)
-    table.insert(lines, format_binding(key, desc, prefix))
-  end
-  table.insert(lines, "")
-  
-  -- Shell aliases
-  table.insert(lines, colors.section .. "━━━ SHELL ALIASES ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-  for category, aliases in pairs(shortcuts.aliases) do
-    table.insert(lines, colors.desc .. "  " .. category:upper() .. ":")
-    for alias, cmd in pairs(aliases) do
-      -- Extract description from comment in shortcuts.lua
-      local desc = cmd:match("%-%-(.+)$") or cmd
-      table.insert(lines, format_binding(alias, desc, false))
-    end
-  end
-  table.insert(lines, "")
-  
-  -- i3 section
-  table.insert(lines, colors.section .. "━━━ i3 WINDOW MANAGER (Mod=" .. shortcuts.i3.mod .. ") ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-  for key, binding in pairs(shortcuts.i3.bindings) do
-    local desc = binding[1]
-    table.insert(lines, format_binding("Mod+" .. key, desc, false))
-  end
-  
-  return table.concat(lines, "\n")
+
+-- Build rofi content
+local rofi_lines = {}
+
+-- Header
+table.insert(rofi_lines, "<span size='x-large' weight='bold'>⌨️  Shortcuts Reference</span>")
+table.insert(rofi_lines, "")
+
+-- TMUX section
+table.insert(rofi_lines, "<span size='large' weight='bold' foreground='#7aa2f7'>━━━ TMUX (Prefix: " .. shortcuts.tmux.prefix .. ") ━━━</span>")
+table.insert(rofi_lines, "")
+
+local tmux_items = {}
+for key, binding in pairs(shortcuts.tmux.bindings) do
+  local desc = binding[1]
+  local prefix = binding.prefix or (binding[3] and binding[3].prefix)
+  local key_str = prefix and ("Prefix " .. key) or key
+  table.insert(tmux_items, {key = key_str, desc = desc})
+end
+table.sort(tmux_items, function(a, b) return a.key < b.key end)
+
+for _, item in ipairs(tmux_items) do
+  table.insert(rofi_lines, string.format("<tt>%-25s</tt>  %s", escape_markup(item.key), escape_markup(item.desc)))
 end
 
--- Check if we're in tmux
-local in_tmux = os.getenv("TMUX") ~= nil
+-- i3 section
+table.insert(rofi_lines, "")
+table.insert(rofi_lines, "<span size='large' weight='bold' foreground='#7aa2f7'>━━━ i3 WINDOW MANAGER (Mod=Alt) ━━━</span>")
+table.insert(rofi_lines, "")
 
-if in_tmux then
-  -- Use tmux display-popup
-  local help_text = generate_help()
-  local tmpfile = os.tmpname()
-  local f = io.open(tmpfile, "w")
-  f:write(help_text)
-  f:write("\n\n" .. colors.title .. "Press any key to close..." .. colors.reset)
-  f:close()
+local i3_items = {}
+for key, binding in pairs(shortcuts.i3.bindings) do
+  local desc = binding[1]
+  local no_mod = binding.no_mod or (binding[3] and binding[3].no_mod)
+  local key_str = no_mod and key or ("Mod+" .. key)
+  table.insert(i3_items, {key = key_str, desc = desc})
+end
+table.sort(i3_items, function(a, b) return a.key < b.key end)
+
+for _, item in ipairs(i3_items) do
+  table.insert(rofi_lines, string.format("<tt>%-25s</tt>  %s", escape_markup(item.key), escape_markup(item.desc)))
+end
+
+-- Shell aliases section
+table.insert(rofi_lines, "")
+table.insert(rofi_lines, "<span size='large' weight='bold' foreground='#7aa2f7'>━━━ SHELL ALIASES ━━━</span>")
+
+for category, aliases in pairs(shortcuts.aliases) do
+  table.insert(rofi_lines, "")
+  table.insert(rofi_lines, "<b>" .. category:upper() .. ":</b>")
   
-  os.execute("tmux display-popup -E -w 80 -h 40 -T '⌨️  Shortcuts Help' 'cat " .. tmpfile .. " && read -n1 && rm -f " .. tmpfile .. "'")
-else
-  -- Check for rofi
-  local has_rofi = os.execute("which rofi >/dev/null 2>&1") == 0
+  local alias_items = {}
+  for alias, cmd in pairs(aliases) do
+    local desc = cmd:match("%-%-(.+)$") or cmd
+    table.insert(alias_items, {alias = alias, desc = desc})
+  end
+  table.sort(alias_items, function(a, b) return a.alias < b.alias end)
   
-  if has_rofi then
-    -- Format for rofi
-    local rofi_lines = {}
-    
-    -- TMUX
-    table.insert(rofi_lines, "<b>TMUX SHORTCUTS (Prefix: " .. shortcuts.tmux.prefix .. ")</b>")
-    for key, binding in pairs(shortcuts.tmux.bindings) do
-      local desc = binding[1]
-      local prefix = binding.prefix or (binding[3] and binding[3].prefix)
-      local key_str = prefix and ("Prefix " .. key) or key
-      table.insert(rofi_lines, string.format("%-20s %s", key_str, desc))
-    end
-    table.insert(rofi_lines, "")
-    
-    -- Aliases
-    table.insert(rofi_lines, "<b>SHELL ALIASES</b>")
-    for category, aliases in pairs(shortcuts.aliases) do
-      table.insert(rofi_lines, category:upper() .. ":")
-      for alias, cmd in pairs(aliases) do
-        table.insert(rofi_lines, string.format("%-20s %s", alias, cmd))
-      end
-    end
-    table.insert(rofi_lines, "")
-    
-    -- i3
-    table.insert(rofi_lines, "<b>i3 WINDOW MANAGER (Mod=" .. shortcuts.i3.mod .. ")</b>")
-    for key, binding in pairs(shortcuts.i3.bindings) do
-      local desc = binding[1]
-      table.insert(rofi_lines, string.format("%-20s %s", "Mod+" .. key, desc))
-    end
-    
-    local tmpfile = os.tmpname()
-    local f = io.open(tmpfile, "w")
-    f:write(table.concat(rofi_lines, "\n"))
-    f:close()
-    
-    os.execute("rofi -dmenu -p 'Shortcuts Help' -markup-rows -i -no-custom " ..
-               "-theme-str 'window {width: 60%;}' " ..
-               "-theme-str 'listview {lines: 30;}' < " .. tmpfile)
-    os.remove(tmpfile)
-  else
-    -- Fallback to terminal output
-    print(generate_help())
-    print("\n" .. colors.title .. "Add 'shortcuts-help' to see this anytime" .. colors.reset)
+  for _, item in ipairs(alias_items) do
+    table.insert(rofi_lines, string.format("<tt>%-25s</tt>  %s", escape_markup(item.alias), escape_markup(item.desc)))
   end
 end
+
+-- Write to temp file and show with rofi
+local tmpfile = os.tmpname()
+local f = io.open(tmpfile, "w")
+f:write(table.concat(rofi_lines, "\n"))
+f:close()
+
+os.execute("rofi -dmenu -p '' -markup-rows -i -no-custom " ..
+           "-theme-str 'window {width: 1000px; height: 80%; location: center;}' " ..
+           "-theme-str 'listview {lines: 40; scrollbar: true;}' " ..
+           "-theme-str 'element {padding: 4px 12px;}' " ..
+           "-theme-str 'element-text {horizontal-align: 0;}' " ..
+           "-theme-str 'inputbar {enabled: false;}' " ..
+           "< " .. tmpfile)
+
+os.remove(tmpfile)

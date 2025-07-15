@@ -52,7 +52,7 @@ M.i3 = {
     -- Format: key = { description, command }
     ["Return"]      = { "Open terminal", "exec kitty" },
     ["d"]           = { "App launcher", "exec --no-startup-id rofi -show drun" },
-    ["question"]    = { "Show shortcuts help (Alt+Shift+?)", "exec shortcuts-help" },
+    ["Ctrl+Shift+question"] = { "Show shortcuts help (Ctrl+?)", "exec shortcuts-help", no_mod = true },
     ["Shift+q"]     = { "Close window", "kill" },
     ["Shift+r"]     = { "Restart i3", "restart" },
     ["Shift+e"]     = { "Exit i3", 'exec "i3-nagbar -t warning -m \\"Exit i3?\\" -B \\"Yes\\" \\"i3-msg exit\\""' },
