@@ -10,8 +10,6 @@ export GTK_IM_MODULE=fcitx
 export QT_IM_MODULE=fcitx
 export XMODIFIERS=@im=fcitx
 
-# Browser alias
-alias browser='pgrep chromium || chromium &'
 
 # Theme
 ZSH_THEME="agnoster"
@@ -42,36 +40,9 @@ export GTK_IM_MODULE=fcitx
 export QT_IM_MODULE=fcitx
 export XMODIFIERS=@im=fcitx
 
-# Aliases
-alias vim="nvim"
-alias vi="nvim"
-alias v="nvim"
-alias ll="ls -alF"
-alias la="ls -A"
-alias l="ls -CF"
-alias gs="git status"
-alias gc="git commit"
-alias gp="git push"
-alias gpl="git pull"
-alias gco="git checkout"
-alias gb="git branch"
-alias ga="git add"
-alias gd="git diff"
-alias gl="git log --oneline --graph --decorate"
-
-# Tmux aliases
-alias ta="tmux attach -t"
-alias tad="tmux attach -d -t"
-alias ts="tmux new-session -s"
-alias tl="tmux list-sessions"
-alias tksv="tmux kill-server"
-alias tkss="tmux kill-session -t"
-
-# Navigation
-alias ..="cd .."
-alias ...="cd ../.."
-alias ....="cd ../../.."
-alias .....="cd ../../../.."
+# Load generated aliases from shortcuts system
+# Run 'shortcuts-generate' to update aliases
+[ -f ~/.config/shortcuts/generated/shell-aliases.sh ] && source ~/.config/shortcuts/generated/shell-aliases.sh
 
 # FZF configuration
 export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git/*"'

@@ -88,36 +88,49 @@ chezmoi init --apply programmatio
 - **Brightnessctl** - Display brightness control
 - **GitHub CLI** - Automatic SSH key registration for new machines
 - **Age encryption** - Secure storage for sensitive files
+- **Shortcuts System** - Centralized keybinding management with auto-generation
 - **Shortcuts Help** - Vimium-style overlay showing all keyboard shortcuts
 
-## Key Bindings
+## Shortcuts System
 
-### i3 (Mod = Super/Windows key)
-- `Mod+Return` - Open terminal (Kitty)
-- `Mod+d` - Application launcher (Rofi)
-- `Mod+h/j/k/l` - Navigate windows
-- `Mod+Shift+h/j/k/l` - Move windows
-- `Mod+1-0` - Switch workspaces
-- `Mod+Shift+q` - Close window
-- `Mod+?` - Show shortcuts help overlay
+All keybindings and aliases are managed centrally through `~/.config/shortcuts/shortcuts.lua`. This provides:
 
-### Tmux (Prefix = Ctrl+a)
-- `Ctrl+a |` - Split vertically
-- `Ctrl+a -` - Split horizontally
-- `Ctrl+a h/j/k/l` - Navigate panes
-- `Ctrl+f` - Tmux sessionizer
-- `Ctrl+a ?` - Show shortcuts help overlay
+- **Single source of truth** - Define shortcuts once, use everywhere
+- **Auto-generation** - Config files are generated automatically
+- **Unified help** - All shortcuts accessible via help overlay
+- **Easy customization** - Edit one Lua file to change all bindings
 
-### Neovim (Leader = Space)
-- `<leader>ff` - Find files
-- `<leader>fg` - Live grep
-- `<leader>e` - File explorer
-- `gd` - Go to definition
-- `K` - Hover documentation
+### Managing Shortcuts
 
-### Global Shortcuts
-- `Ctrl+?` - Show shortcuts help (in terminal)
-- `shortcuts-help` - Show shortcuts help (command)
+1. Edit shortcuts definition:
+   ```bash
+   vim ~/.config/shortcuts/shortcuts.lua
+   ```
+
+2. Changes are applied automatically with chezmoi:
+   ```bash
+   chezmoi apply
+   ```
+
+3. Or manually regenerate:
+   ```bash
+   shortcuts-generate
+   ```
+
+### Viewing Shortcuts
+
+- **Universal**: Press `Alt+Shift+?` (works in both tmux and i3)
+- **Command line**: Run `shortcuts-help`
+
+### Key Bindings Overview
+
+The shortcuts system manages bindings for:
+- **i3 window manager** - Window navigation, workspaces, layouts
+- **tmux** - Panes, windows, sessions
+- **Shell aliases** - Git, navigation, applications
+- **Custom tools** - Tmux sessionizer, shortcuts help
+
+For a complete list of shortcuts, use the help overlay (`Alt+Shift+?`).
 
 ## Repository Structure
 
@@ -135,10 +148,14 @@ chezmoi init --apply programmatio
 │   ├── kitty/                 # Terminal emulator
 │   ├── nvim/                  # Neovim configuration
 │   ├── picom/                 # Compositor config
-│   └── rofi/                  # Application launcher
+│   ├── rofi/                  # Application launcher
+│   └── shortcuts/             # Centralized shortcuts configuration
+│       └── shortcuts.lua      # All keybindings and aliases
 ├── dot_local/                 # ~/.local directory
 │   └── bin/                   # User scripts
-│       ├── executable_*       # Scripts with execute permission
+│       ├── shortcuts-generate # Generate configs from shortcuts.lua
+│       ├── shortcuts-help     # Display shortcuts overlay
+│       └── executable_*       # Other executable scripts
 ├── dot_gitconfig.tmpl         # Git configuration template
 ├── dot_tmux.conf              # Tmux configuration
 ├── dot_zshrc                  # Zsh shell configuration

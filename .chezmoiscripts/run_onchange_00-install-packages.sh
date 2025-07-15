@@ -28,6 +28,7 @@ sudo pacman -Syu --noconfirm \
     kitty \
     i3-wm \
     i3status \
+    lua \
     i3blocks \
     dmenu \
     rofi \

@@ -43,6 +43,7 @@ age -d ~/.config/chezmoi/key.txt.age
 ├── .chezmoiscripts/           # Automated setup scripts
 │   ├── run_onchange_00-install-packages.sh
 │   ├── run_onchange_10-install-nerd-font.sh
+│   ├── run_onchange_50-generate-shortcuts.sh  # Auto-generate shortcuts
 │   ├── run_once_99-post-install-message.sh
 │   └── run_once_after_*.tmpl  # Templates for SSH & encryption
 ├── .chezmoitemplates/         # Reusable template snippets
@@ -54,11 +55,14 @@ age -d ~/.config/chezmoi/key.txt.age
 │   ├── kitty/                 # Terminal emulator
 │   ├── nvim/                  # Neovim (LazyVim) setup
 │   ├── picom/                 # Compositor for transparency
-│   └── rofi/                  # Application launcher
+│   ├── rofi/                  # Application launcher
+│   └── shortcuts/             # Centralized shortcuts system
+│       └── shortcuts.lua      # All keybindings and aliases definition
 ├── dot_local/bin/             # Maps to ~/.local/bin/
 │   ├── executable_brightness-control
 │   ├── executable_github-setup
-│   ├── executable_shortcuts-help
+│   ├── executable_shortcuts-generate  # Generate configs from shortcuts.lua
+│   ├── executable_shortcuts-help      # Display shortcuts overlay
 │   └── executable_tmux-sessionizer
 ├── dot_gitconfig.tmpl         # Git configuration with templates
 ├── dot_tmux.conf              # Tmux multiplexer config
@@ -87,7 +91,8 @@ age -d ~/.config/chezmoi/key.txt.age
 2. Font installation (`10-install-nerd-font.sh`)
 3. SSH key generation (`20-generate-ssh-key.sh.tmpl`)
 4. Age encryption setup (`30-setup-age-encryption.sh`)
-5. Post-install instructions (`99-post-install-message.sh`)
+5. Shortcuts generation (`50-generate-shortcuts.sh`) - Auto-generates keybindings
+6. Post-install instructions (`99-post-install-message.sh`)
 
 ### OS Detection
 - Scripts use `chezmoi.os` and `chezmoi.osRelease.id` for OS detection
@@ -104,6 +109,26 @@ age -d ~/.config/chezmoi/key.txt.age
 - `run_once_` scripts only run once per machine
 - Scripts are executed in alphabetical order
 
+## Shortcuts System
+
+The repository implements a centralized shortcuts management system:
+
+### Architecture
+- **Definition**: All keybindings and aliases defined in `~/.config/shortcuts/shortcuts.lua`
+- **Generation**: `shortcuts-generate` creates config files for tmux, i3, and shell
+- **Auto-update**: Changes trigger regeneration via `run_onchange_50-generate-shortcuts.sh`
+- **Help overlay**: `shortcuts-help` displays all shortcuts (accessible via Alt+Shift+? universally)
+
+### Generated Files
+- `~/.config/shortcuts/generated/tmux-keybindings.conf` - Sourced by tmux.conf
+- `~/.config/shortcuts/generated/i3-keybindings.conf` - Included by i3/config
+- `~/.config/shortcuts/generated/shell-aliases.sh` - Sourced by .zshrc
+
+### Adding/Modifying Shortcuts
+1. Edit `dot_config/shortcuts/shortcuts.lua`
+2. Run `chezmoi apply` (auto-generates configs)
+3. Reload affected applications
+
 ## Recent Changes (for Claude Code context)
 
 - Removed all macOS support - now Arch Linux only
@@ -112,5 +137,6 @@ age -d ~/.config/chezmoi/key.txt.age
 - Migrated from `run_once_` to `run_onchange_` for package/font scripts
 - Added `.chezmoiignore` to exclude documentation from home directory
 - Added `.chezmoiremove` to clean up old macOS configurations
+- Added centralized shortcuts system with auto-generation
 - Added `shortcuts-help` - Vimium-style overlay showing all shortcuts
 

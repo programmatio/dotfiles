@@ -1,0 +1,87 @@
+#!/usr/bin/env lua
+
+-- Generate configuration files from shortcuts.lua
+local home = os.getenv("HOME")
+local shortcuts_file = home .. "/.config/shortcuts/shortcuts.lua"
+
+-- Check if file exists, if not try dotfiles directory
+local f = io.open(shortcuts_file, "r")
+if not f then
+  shortcuts_file = home .. "/personal/dotfiles/dot_config/shortcuts/shortcuts.lua"
+  f = io.open(shortcuts_file, "r")
+  if not f then
+    print("⚠️  Shortcuts file not found at " .. shortcuts_file)
+    print("   This is normal during initial chezmoi setup")
+    print("   The file will be created when chezmoi apply completes")
+    os.exit(0)
+  end
+end
+f:close()
+
+local shortcuts = dofile(shortcuts_file)
+
+-- Ensure output directory exists
+os.execute("mkdir -p " .. home .. "/.config/shortcuts/generated")
+
+-- Helper to write file
+local function write_file(path, content)
+  local file = io.open(path, "w")
+  file:write(content)
+  file:close()
+  print("✅ Generated: " .. path)
+end
+
+-- Generate tmux configuration
+local tmux_lines = {
+  "# Generated tmux keybindings - DO NOT EDIT",
+  "# Edit ~/.config/shortcuts/shortcuts.lua and run shortcuts-generate",
+  ""
+}
+
+for key, binding in pairs(shortcuts.tmux.bindings) do
+  local desc, cmd = binding[1], binding[2]
+  local prefix = binding.prefix or (type(binding[3]) == "table" and binding[3].prefix)
+  local bind = prefix and "bind-key" or "bind-key -n"
+  table.insert(tmux_lines, bind .. " " .. key .. " " .. cmd)
+end
+
+write_file(home .. "/.config/shortcuts/generated/tmux-keybindings.conf", 
+           table.concat(tmux_lines, "\n"))
+
+-- Generate i3 configuration  
+local i3_lines = {
+  "# Generated i3 keybindings - DO NOT EDIT",
+  "# Edit ~/.config/shortcuts/shortcuts.lua and run shortcuts-generate",
+  ""
+}
+
+for key, binding in pairs(shortcuts.i3.bindings) do
+  local desc, cmd = binding[1], binding[2]
+  table.insert(i3_lines, "bindsym $mod+" .. key .. " " .. cmd)
+end
+
+write_file(home .. "/.config/shortcuts/generated/i3-keybindings.conf",
+           table.concat(i3_lines, "\n"))
+
+-- Generate shell aliases
+local alias_lines = {
+  "# Generated shell aliases - DO NOT EDIT", 
+  "# Edit ~/.config/shortcuts/shortcuts.lua and run shortcuts-generate",
+  ""
+}
+
+for category, aliases in pairs(shortcuts.aliases) do
+  table.insert(alias_lines, "# " .. category:upper())
+  for alias, cmd in pairs(aliases) do
+    table.insert(alias_lines, "alias " .. alias .. "='" .. cmd .. "'")
+  end
+  table.insert(alias_lines, "")
+end
+
+write_file(home .. "/.config/shortcuts/generated/shell-aliases.sh",
+           table.concat(alias_lines, "\n"))
+
+print("\n📝 To apply changes, add these lines:")
+print("   ~/.tmux.conf:        source-file ~/.config/shortcuts/generated/tmux-keybindings.conf")
+print("   ~/.config/i3/config: include ~/.config/shortcuts/generated/i3-keybindings.conf")  
+print("   ~/.zshrc:            source ~/.config/shortcuts/generated/shell-aliases.sh")
