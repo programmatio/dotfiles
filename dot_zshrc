@@ -103,5 +103,8 @@ bindkey -s ^f "tmux-sessionizer\n"
 # Shortcuts help binding (Ctrl+?)
 bindkey -s '^_' "shortcuts-help\n"
 
+# Claude Code alias
+alias claude="npx @anthropic/claude-code"
+
 # Load local zsh config if exists
 [ -f ~/.zshrc.local ] && source ~/.zshrc.local

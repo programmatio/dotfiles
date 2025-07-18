@@ -14,3 +14,6 @@ ENCRYPTION.md
 
 # License file (if any)
 LICENSE
+
+# Neovim lazy-lock.json (managed by lazy.nvim, causes TTY issues)
+.config/nvim/lazy-lock.json

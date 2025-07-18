@@ -10,6 +10,9 @@ include ~/.config/shortcuts/generated/i3-keybindings.conf
 # Font for window titles
 font pango:JetBrainsMono Nerd Font 14
 
+# Default split orientation - new windows will split vertically
+default_orientation vertical
+
 # Define colors (Tokyo Night theme)
 set $bg-color            #1a1b26
 set $inactive-bg-color   #24283b
