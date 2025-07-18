@@ -93,6 +93,61 @@ M.i3 = {
   end
 }
 
+-- Kitty Terminal
+M.kitty = {
+  bindings = {
+    -- Vim-style scrolling
+    ["alt+k"] = { "Scroll line up", "scroll_line_up" },
+    ["alt+j"] = { "Scroll line down", "scroll_line_down" },
+    ["alt+u"] = { "Scroll page up", "scroll_page_up" },
+    ["alt+d"] = { "Scroll page down", "scroll_page_down" },
+    ["alt+g"] = { "Scroll to top", "scroll_home" },
+    ["alt+shift+g"] = { "Scroll to bottom", "scroll_end" },
+    
+    -- Vim-style window navigation
+    ["alt+h"] = { "Navigate window left", "neighboring_window left" },
+    ["alt+l"] = { "Navigate window right", "neighboring_window right" },
+    ["alt+j"] = { "Navigate window down", "neighboring_window down" },
+    ["alt+k"] = { "Navigate window up", "neighboring_window up" },
+    
+    -- Tab navigation
+    ["alt+shift+h"] = { "Previous tab", "previous_tab" },
+    ["alt+shift+l"] = { "Next tab", "next_tab" },
+    
+    -- Scrollback
+    ["alt+shift+v"] = { "Open scrollback in nvim", "show_scrollback" },
+  }
+}
+
+-- ZSH Vi Mode
+M.zsh_vi_mode = {
+  description = "ZSH vi-mode plugin enabled",
+  bindings = {
+    ["ESC"] = { "Enter normal mode", "Enter vim normal mode for command line editing" },
+    ["i"] = { "Enter insert mode", "Enter vim insert mode (in normal mode)" },
+    ["a"] = { "Append", "Move cursor forward and enter insert mode (in normal mode)" },
+    ["A"] = { "Append at end", "Move to end of line and enter insert mode (in normal mode)" },
+    ["I"] = { "Insert at beginning", "Move to beginning and enter insert mode (in normal mode)" },
+    
+    -- Navigation (in normal mode)
+    ["h"] = { "Move left", "Move cursor left (in normal mode)" },
+    ["l"] = { "Move right", "Move cursor right (in normal mode)" },
+    ["w"] = { "Next word", "Move to next word (in normal mode)" },
+    ["b"] = { "Previous word", "Move to previous word (in normal mode)" },
+    ["0"] = { "Beginning of line", "Move to beginning of line (in normal mode)" },
+    ["$"] = { "End of line", "Move to end of line (in normal mode)" },
+    
+    -- Editing (in normal mode)
+    ["dd"] = { "Delete line", "Delete entire line (in normal mode)" },
+    ["dw"] = { "Delete word", "Delete word (in normal mode)" },
+    ["cw"] = { "Change word", "Change word (in normal mode)" },
+    ["x"] = { "Delete char", "Delete character (in normal mode)" },
+    ["r"] = { "Replace char", "Replace character (in normal mode)" },
+    ["u"] = { "Undo", "Undo last change (in normal mode)" },
+    ["Ctrl+r"] = { "Redo", "Redo last undo (in normal mode)" },
+  }
+}
+
 -- Shell Aliases
 M.aliases = {
   -- Format: alias = command (description in comments for help display)

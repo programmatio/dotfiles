@@ -64,8 +64,8 @@ chezmoi init --apply programmatio
 ## What's included
 
 ### Core Applications
-- **Kitty** - GPU-based terminal emulator with Tokyo Night theme
-- **Zsh** - Shell with Oh My Zsh framework and plugins
+- **Kitty** - GPU-based terminal emulator with Tokyo Night theme and vim keybindings
+- **Zsh** - Shell with Oh My Zsh framework, plugins, and vi-mode
 - **Neovim** - Text editor with LSP support and modern plugins
 - **Tmux** - Terminal multiplexer with sessionizer
 - **Git** - Version control with custom configuration
@@ -89,7 +89,8 @@ chezmoi init --apply programmatio
 - **GitHub CLI** - Automatic SSH key registration for new machines
 - **Age encryption** - Secure storage for sensitive files
 - **Shortcuts System** - Centralized keybinding management with auto-generation
-- **Shortcuts Help** - Vimium-style overlay showing all keyboard shortcuts
+- **Shortcuts Help** - Multi-backend display (fzf, terminal, rofi) with search/filter
+- **Vim Mode** - Vi keybindings for zsh and kitty terminal
 
 ## Shortcuts System
 
@@ -120,7 +121,14 @@ All keybindings and aliases are managed centrally through `~/.config/shortcuts/s
 ### Viewing Shortcuts
 
 - **Universal**: Press `Alt+Shift+?` (works in both tmux and i3)
-- **Command line**: Run `shortcuts-help`
+- **Command line**: 
+  ```bash
+  shortcuts-help              # Auto-detect best display method
+  shortcuts-help fzf          # Interactive search with fzf
+  shortcuts-help terminal     # Paged view with bat/less
+  shortcuts-help rofi         # GUI popup window
+  shortcuts-help fzf tmux     # Filter to show only tmux shortcuts
+  ```
 
 ### Key Bindings Overview
 
@@ -128,6 +136,8 @@ The shortcuts system manages bindings for:
 - **i3 window manager** - Window navigation, workspaces, layouts
 - **tmux** - Panes, windows, sessions
 - **Shell aliases** - Git, navigation, applications
+- **Kitty terminal** - Vim-style navigation and scrolling
+- **ZSH vi-mode** - Vim keybindings for command line editing
 - **Custom tools** - Tmux sessionizer, shortcuts help
 
 For a complete list of shortcuts, use the help overlay (`Alt+Shift+?`).

@@ -1,105 +1,286 @@
-#!/usr/bin/env lua
+#!/usr/bin/env bash
 
--- Shortcuts Help - Display all shortcuts in a nice format
--- Reads from centralized shortcuts.lua configuration
+# Shortcuts Help - Multi-backend display system
+# Supports: fzf (interactive search), terminal (with bat/less), rofi (GUI)
 
-local home = os.getenv("HOME")
-local shortcuts_file = home .. "/.config/shortcuts/shortcuts.lua"
+set -e
 
--- Try dotfiles directory if not in home
-local f = io.open(shortcuts_file, "r")
-if not f then
-  shortcuts_file = home .. "/personal/dotfiles/dot_config/shortcuts/shortcuts.lua"
+# Configuration
+SHORTCUTS_FILE="$HOME/.config/shortcuts/shortcuts.lua"
+BACKEND="${1:-auto}"  # auto, fzf, terminal, rofi
+FILTER="${2:-}"       # Filter by category: tmux, i3, kitty, vim, shell
+
+# Check if shortcuts file exists
+if [[ ! -f "$SHORTCUTS_FILE" ]]; then
+    echo "Error: Shortcuts file not found at $SHORTCUTS_FILE" >&2
+    exit 1
+fi
+
+# Detect best available backend
+detect_backend() {
+    if [[ "$BACKEND" != "auto" ]]; then
+        echo "$BACKEND"
+        return
+    fi
+    
+    # In SSH or no display, prefer terminal backends
+    if [[ -n "$SSH_CONNECTION" ]] || [[ -z "$DISPLAY" ]]; then
+        if command -v fzf >/dev/null 2>&1; then
+            echo "fzf"
+        else
+            echo "terminal"
+        fi
+    else
+        # With display, check what's available
+        if command -v fzf >/dev/null 2>&1; then
+            echo "fzf"
+        elif command -v rofi >/dev/null 2>&1; then
+            echo "rofi"
+        else
+            echo "terminal"
+        fi
+    fi
+}
+
+# Generate formatted shortcuts content
+generate_content() {
+    lua << 'EOF'
+local shortcuts = dofile(os.getenv("SHORTCUTS_FILE"))
+local filter = os.getenv("FILTER") or ""
+local format = os.getenv("FORMAT") or "plain"
+
+-- ANSI color codes
+local colors = {
+    reset = "\27[0m",
+    bold = "\27[1m",
+    dim = "\27[2m",
+    red = "\27[31m",
+    green = "\27[32m",
+    yellow = "\27[33m",
+    blue = "\27[34m",
+    magenta = "\27[35m",
+    cyan = "\27[36m",
+    white = "\27[37m",
+}
+
+-- Helper to format based on output type
+local function fmt(text, color)
+    if format == "plain" then
+        return text
+    elseif format == "ansi" then
+        return colors[color] .. text .. colors.reset
+    end
+end
+
+-- Collect all shortcuts into a flat structure
+local all_shortcuts = {}
+
+-- Process TMUX shortcuts
+if filter == "" or filter == "tmux" then
+    for key, binding in pairs(shortcuts.tmux.bindings) do
+        local desc = binding[1]
+        local prefix = binding.prefix or (binding[3] and binding[3].prefix)
+        local key_str = prefix and ("Prefix " .. key) or key
+        table.insert(all_shortcuts, {
+            category = "TMUX",
+            key = key_str,
+            desc = desc,
+            command = binding[2],
+            raw_key = key
+        })
+    end
+end
+
+-- Process i3 shortcuts
+if filter == "" or filter == "i3" then
+    for key, binding in pairs(shortcuts.i3.bindings) do
+        local desc = binding[1]
+        local no_mod = binding.no_mod or (binding[3] and binding[3].no_mod)
+        local key_str = no_mod and key or ("Mod+" .. key)
+        table.insert(all_shortcuts, {
+            category = "i3",
+            key = key_str,
+            desc = desc,
+            command = binding[2],
+            raw_key = key
+        })
+    end
+end
+
+-- Process Kitty shortcuts
+if filter == "" or filter == "kitty" then
+    if shortcuts.kitty then
+        for key, binding in pairs(shortcuts.kitty.bindings) do
+            table.insert(all_shortcuts, {
+                category = "Kitty",
+                key = key,
+                desc = binding[1],
+                command = binding[2],
+                raw_key = key
+            })
+        end
+    end
+end
+
+-- Process ZSH Vi Mode
+if filter == "" or filter == "vim" or filter == "zsh" then
+    if shortcuts.zsh_vi_mode then
+        for key, binding in pairs(shortcuts.zsh_vi_mode.bindings) do
+            table.insert(all_shortcuts, {
+                category = "ZSH-Vi",
+                key = key,
+                desc = binding[1],
+                command = binding[2],
+                raw_key = key
+            })
+        end
+    end
+end
+
+-- Process Shell Aliases
+if filter == "" or filter == "shell" then
+    for cat, aliases in pairs(shortcuts.aliases) do
+        for alias, cmd in pairs(aliases) do
+            local desc = cmd:match("%-%-(.+)$") or cmd
+            table.insert(all_shortcuts, {
+                category = "Shell-" .. cat,
+                key = alias,
+                desc = desc,
+                command = cmd,
+                raw_key = alias
+            })
+        end
+    end
+end
+
+-- Sort shortcuts
+table.sort(all_shortcuts, function(a, b)
+    if a.category ~= b.category then
+        return a.category < b.category
+    end
+    return a.key < b.key
+end)
+
+-- Output based on format
+if os.getenv("OUTPUT_FORMAT") == "fzf" then
+    -- FZF format: one line per shortcut with aligned columns
+    for _, s in ipairs(all_shortcuts) do
+        print(string.format("%-12s │ %-25s │ %s", 
+            s.category, s.key, s.desc))
+    end
+elseif os.getenv("OUTPUT_FORMAT") == "terminal" then
+    -- Terminal format with headers and nice formatting
+    local current_category = nil
+    for _, s in ipairs(all_shortcuts) do
+        if s.category ~= current_category then
+            if current_category then print() end
+            print(fmt("━━━ " .. s.category .. " ━━━", "cyan"))
+            current_category = s.category
+        end
+        print(string.format("  %-25s  %s", 
+            fmt(s.key, "yellow"), s.desc))
+    end
 else
-  f:close()
+    -- Rofi format with Pango markup
+    print("<span size='x-large' weight='bold'>⌨️  Shortcuts Reference</span>")
+    print("")
+    
+    local current_category = nil
+    for _, s in ipairs(all_shortcuts) do
+        if s.category ~= current_category then
+            if current_category then print("") end
+            print("<span size='large' weight='bold' foreground='#7aa2f7'>━━━ " .. 
+                  s.category .. " ━━━</span>")
+            print("")
+            current_category = s.category
+        end
+        -- Escape special characters for Pango markup
+        local key = s.key:gsub("&", "&amp;"):gsub("<", "&lt;"):gsub(">", "&gt;")
+        local desc = s.desc:gsub("&", "&amp;"):gsub("<", "&lt;"):gsub(">", "&gt;")
+        print(string.format("<tt>%-25s</tt>  %s", key, desc))
+    end
 end
+EOF
+}
 
-local shortcuts = dofile(shortcuts_file)
+# Display with fzf (interactive search)
+display_fzf() {
+    export FORMAT="ansi"
+    export OUTPUT_FORMAT="fzf"
+    
+    generate_content | fzf \
+        --ansi \
+        --header "⌨️  Shortcuts Help (←↑↓→ navigate, / to search, ESC to exit)" \
+        --preview-window="hidden" \
+        --layout="reverse" \
+        --height="100%" \
+        --bind="ctrl-/:toggle-preview" \
+        --prompt="Search: " \
+        --no-multi
+}
 
--- Function to escape special characters for Pango markup
-local function escape_markup(str)
-  return str:gsub("&", "&amp;")
-            :gsub("<", "&lt;")
-            :gsub(">", "&gt;")
-            :gsub("\"", "&quot;")
-            :gsub("'", "&apos;")
-end
+# Display in terminal with less/bat
+display_terminal() {
+    export FORMAT="ansi"
+    export OUTPUT_FORMAT="terminal"
+    
+    local content=$(generate_content)
+    
+    # Add header
+    local full_content="⌨️  SHORTCUTS REFERENCE
+$(printf '%.0s═' {1..50})
 
+$content
 
--- Build rofi content
-local rofi_lines = {}
+$(printf '%.0s═' {1..50})
+Press 'q' to quit, '/' to search"
+    
+    if command -v bat >/dev/null 2>&1; then
+        echo "$full_content" | bat --style=plain --paging=always --language=txt
+    elif command -v less >/dev/null 2>&1; then
+        echo "$full_content" | less -R
+    else
+        echo "$full_content"
+    fi
+}
 
--- Header
-table.insert(rofi_lines, "<span size='x-large' weight='bold'>⌨️  Shortcuts Reference</span>")
-table.insert(rofi_lines, "")
+# Display with rofi (original method)
+display_rofi() {
+    export FORMAT="rofi"
+    export OUTPUT_FORMAT="rofi"
+    
+    local tmpfile=$(mktemp)
+    generate_content > "$tmpfile"
+    
+    rofi -dmenu -p '' -markup-rows -i -no-custom \
+        -theme-str 'window {width: 1000px; height: 80%; location: center;}' \
+        -theme-str 'listview {lines: 40; scrollbar: true;}' \
+        -theme-str 'element {padding: 4px 12px;}' \
+        -theme-str 'element-text {horizontal-align: 0;}' \
+        -theme-str 'inputbar {enabled: false;}' \
+        < "$tmpfile"
+    
+    rm -f "$tmpfile"
+}
 
--- TMUX section
-table.insert(rofi_lines, "<span size='large' weight='bold' foreground='#7aa2f7'>━━━ TMUX (Prefix: " .. shortcuts.tmux.prefix .. ") ━━━</span>")
-table.insert(rofi_lines, "")
+# Main execution
+BACKEND=$(detect_backend)
+export SHORTCUTS_FILE
+export FILTER
 
-local tmux_items = {}
-for key, binding in pairs(shortcuts.tmux.bindings) do
-  local desc = binding[1]
-  local prefix = binding.prefix or (binding[3] and binding[3].prefix)
-  local key_str = prefix and ("Prefix " .. key) or key
-  table.insert(tmux_items, {key = key_str, desc = desc})
-end
-table.sort(tmux_items, function(a, b) return a.key < b.key end)
-
-for _, item in ipairs(tmux_items) do
-  table.insert(rofi_lines, string.format("<tt>%-25s</tt>  %s", escape_markup(item.key), escape_markup(item.desc)))
-end
-
--- i3 section
-table.insert(rofi_lines, "")
-table.insert(rofi_lines, "<span size='large' weight='bold' foreground='#7aa2f7'>━━━ i3 WINDOW MANAGER (Mod=Alt) ━━━</span>")
-table.insert(rofi_lines, "")
-
-local i3_items = {}
-for key, binding in pairs(shortcuts.i3.bindings) do
-  local desc = binding[1]
-  local no_mod = binding.no_mod or (binding[3] and binding[3].no_mod)
-  local key_str = no_mod and key or ("Mod+" .. key)
-  table.insert(i3_items, {key = key_str, desc = desc})
-end
-table.sort(i3_items, function(a, b) return a.key < b.key end)
-
-for _, item in ipairs(i3_items) do
-  table.insert(rofi_lines, string.format("<tt>%-25s</tt>  %s", escape_markup(item.key), escape_markup(item.desc)))
-end
-
--- Shell aliases section
-table.insert(rofi_lines, "")
-table.insert(rofi_lines, "<span size='large' weight='bold' foreground='#7aa2f7'>━━━ SHELL ALIASES ━━━</span>")
-
-for category, aliases in pairs(shortcuts.aliases) do
-  table.insert(rofi_lines, "")
-  table.insert(rofi_lines, "<b>" .. category:upper() .. ":</b>")
-  
-  local alias_items = {}
-  for alias, cmd in pairs(aliases) do
-    local desc = cmd:match("%-%-(.+)$") or cmd
-    table.insert(alias_items, {alias = alias, desc = desc})
-  end
-  table.sort(alias_items, function(a, b) return a.alias < b.alias end)
-  
-  for _, item in ipairs(alias_items) do
-    table.insert(rofi_lines, string.format("<tt>%-25s</tt>  %s", escape_markup(item.alias), escape_markup(item.desc)))
-  end
-end
-
--- Write to temp file and show with rofi
-local tmpfile = os.tmpname()
-local f = io.open(tmpfile, "w")
-f:write(table.concat(rofi_lines, "\n"))
-f:close()
-
-os.execute("rofi -dmenu -p '' -markup-rows -i -no-custom " ..
-           "-theme-str 'window {width: 1000px; height: 80%; location: center;}' " ..
-           "-theme-str 'listview {lines: 40; scrollbar: true;}' " ..
-           "-theme-str 'element {padding: 4px 12px;}' " ..
-           "-theme-str 'element-text {horizontal-align: 0;}' " ..
-           "-theme-str 'inputbar {enabled: false;}' " ..
-           "< " .. tmpfile)
-
-os.remove(tmpfile)
+case "$BACKEND" in
+    fzf)
+        display_fzf
+        ;;
+    terminal)
+        display_terminal
+        ;;
+    rofi)
+        display_rofi
+        ;;
+    *)
+        echo "Error: Unknown backend: $BACKEND" >&2
+        echo "Available: auto, fzf, terminal, rofi" >&2
+        exit 1
+        ;;
+esac

@@ -129,6 +129,42 @@ The repository implements a centralized shortcuts management system:
 2. Run `chezmoi apply` (auto-generates configs)
 3. Reload affected applications
 
+### Viewing Shortcuts
+The `shortcuts-help` command now supports multiple display backends:
+
+```bash
+shortcuts-help              # Auto-detect best backend
+shortcuts-help fzf          # Interactive search with fzf
+shortcuts-help terminal     # Paged view with bat/less
+shortcuts-help rofi         # GUI popup (original)
+shortcuts-help fzf tmux     # Filter to show only tmux shortcuts
+shortcuts-help terminal i3  # Show only i3 shortcuts in terminal
+```
+
+Features:
+- **FZF mode**: Real-time search with `/`, interactive navigation
+- **Terminal mode**: Color-coded, paginated view for SSH sessions
+- **Auto-detection**: Picks best backend based on environment
+- **Filtering**: Show shortcuts for specific applications
+
+## Vim Mode Configuration
+
+### ZSH Vi Mode
+The shell now uses vi-mode for command line editing:
+- `ESC`: Enter normal mode
+- `i`, `a`, `I`, `A`: Various insert modes
+- `h`, `j`, `k`, `l`: Navigate in normal mode
+- `w`, `b`, `0`, `$`: Word and line movement
+- `dd`, `cw`, `x`: Editing commands
+- `u`, `Ctrl+r`: Undo/redo
+
+### Kitty Terminal Vim Bindings
+Kitty now includes vim-style navigation:
+- **Scrolling**: `Alt+j/k` (line), `Alt+d/u` (page), `Alt+g/G` (top/bottom)
+- **Window Navigation**: `Alt+h/j/k/l` to move between panes
+- **Tab Navigation**: `Alt+Shift+h/l` for previous/next tab
+- **Scrollback**: `Alt+Shift+v` opens scrollback in nvim
+
 ## Recent Changes (for Claude Code context)
 
 - Removed all macOS support - now Arch Linux only
@@ -138,5 +174,7 @@ The repository implements a centralized shortcuts management system:
 - Added `.chezmoiignore` to exclude documentation from home directory
 - Added `.chezmoiremove` to clean up old macOS configurations
 - Added centralized shortcuts system with auto-generation
-- Added `shortcuts-help` - Vimium-style overlay showing all shortcuts
+- Added `shortcuts-help` - Multi-backend display system (fzf, terminal, rofi)
+- Added vim mode support for zsh (vi-mode plugin) and kitty terminal
+- Enhanced shortcuts display with search and filtering capabilities
 
