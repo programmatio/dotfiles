@@ -106,5 +106,8 @@ bindkey -s '^_' "shortcuts-help\n"
 # Claude Code alias
 alias claude="npx @anthropic/claude-code"
 
+# ZSH Autosuggestions - use Tab to accept
+bindkey '\t' autosuggest-accept
+
 # Load local zsh config if exists
 [ -f ~/.zshrc.local ] && source ~/.zshrc.local
