@@ -27,6 +27,7 @@ plugins=(
     z
     fzf
     vi-mode
+    npm
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -105,6 +106,31 @@ bindkey -s '^_' "shortcuts-help\n"
 
 # Claude Code alias
 alias claude="npx @anthropic/claude-code"
+
+# Package manager aliases for quick script execution
+alias p="pnpm"
+alias pr="pnpm run"
+alias n="npm"
+alias nr="npm run"
+
+# Function to list and run package.json scripts
+pnpm-run() {
+    if [ -f package.json ]; then
+        local script=$(cat package.json | jq -r '.scripts | keys[]' | fzf --height=40% --reverse)
+        [ -n "$script" ] && pnpm run "$script"
+    else
+        echo "No package.json found"
+    fi
+}
+
+npm-run() {
+    if [ -f package.json ]; then
+        local script=$(cat package.json | jq -r '.scripts | keys[]' | fzf --height=40% --reverse)
+        [ -n "$script" ] && npm run "$script"
+    else
+        echo "No package.json found"
+    fi
+}
 
 # ZSH Autosuggestions - use Tab to accept
 bindkey '\t' autosuggest-accept
